@@ -9,8 +9,8 @@ export const creatorsData = [
     description: "Hi!! I'm Jaz, a contributor of this website whose role involves organizing data and assisting our leader in guiding the group. Excitedly, I engage in this project as it serves as a vital platform for disseminating information among students across various clubs. I firmly believe in the potential of this website to greatly benefit our school community. My enthusiasm for technology has propelled me towards this opportunity, and I am grateful to be part of such an impactful initiative."
   },
   {
-    name: "Deam Almarinez",
-    description: null,
+    name: "Dean Almarinez",
+    description: "Good day, I'm Dean Jared D. Almarinez, a contributor and researcher involved in this project. For this projects I had contributed with the concept, ideas and backing related studies used to be able to formulate the concept for this website. This website is a vital part and product of our research project to know it's effectiveness and impact.",
     image: "cubs-of-cubs.png"
   },
   {
@@ -25,11 +25,11 @@ export const creatorsData = [
   },
   {
     name: "Russel Martinez",
-    description: null,
+    description: "Hello Guys, I'm Russell Martinez, Proud Contributor in our website “Clubs for Cubs”. Happy to assist in giving you an exciting experience towards your club choices. As your choices chose you to have a better time in your engaging, impactful, and wonderful club activities.",
     image: "cubs-of-cubs.png"
   },
   {
-    name: "red Morales",
+    name: "Red Morales",
     description: null,
     image: "cubs-of-cubs.png"
   },
