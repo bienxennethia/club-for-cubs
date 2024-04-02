@@ -1,0 +1,56 @@
+@import 'src/styles/index.scss';
+
+.admin-btns {
+  bottom: 0;
+  right: t-rem(10);
+  z-index: 999;
+  display: flex;
+  margin-top: t-rem(10);
+
+  @include bp-tablet {
+    position: absolute;
+    margin-top: 0;
+  }
+}
+
+.admin-btns__btn {
+  padding: t-rem(5);
+  border-radius: 100%;
+  cursor: pointer;
+
+  svg {
+    width: t-rem(30);
+    height: auto;
+    stroke: $deep-red;
+  }
+
+  @include bp-desktop {
+    svg {
+      width: t-rem(50);
+    }
+  }
+
+  &:hover svg {
+    stroke: $dark-red;
+  }
+}
+
+
+.forum__item .admin-btns {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: auto;
+}
+
+
+.forum__item .admin-btns__btn {
+  svg {
+    stroke: $maroon;
+    width: t-rem(30);
+  }
+
+  &:hover svg {
+    stroke: $dark-red;
+  }
+}

@@ -1,0 +1,113 @@
+@import 'src/styles/index.scss';
+
+.dropdown-container {
+  position: relative;
+}
+
+.dropdown-header {
+  padding: t-rem(30);
+  padding-left: t-rem(20);
+  border: t-rem(1) solid $maroon;
+  border-radius: t-rem(4);
+  cursor: pointer;
+  background-color: $maroon;
+  border-radius: t-rem(15);
+  position: relative;
+  font-size: t-rem(12);
+  display: flex;
+  justify-content: space-between;
+  width: t-rem(250);
+
+  .isForums & {
+    width: auto;
+    font-size: t-rem(20);
+    font-weight: 900;
+  }
+
+  svg {
+    width: t-rem(20);
+    height: auto;
+    rotate: 90deg;
+    fill: $white;
+    transition: rotate 0.3s ease;
+  }
+
+  &.open svg {
+    rotate: 270deg;
+  }
+}
+
+.dropdown-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  overflow-y: auto;
+  border: t-rem(1) solid $deep-red;
+  border-top: none;
+  border-radius: 0 0 t-rem(4) t-rem(4);
+  background-color: $deep-red;
+  z-index: 10;
+  max-height: t-rem(300);
+
+  .isForums & {
+    position: initial;
+  }
+}
+
+.dropdown-option {
+  padding: t-rem(20) t-rem(10);
+  cursor: pointer;
+  color: $maroon;
+  font-weight: bold;
+  font-size: t-rem(14);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .isForums & {
+    justify-content: flex-start;
+    gap: t-rem(10);
+  }
+
+  svg {
+    width: t-rem(50);
+    height: auto;
+    fill: $maroon;
+  }
+}
+
+.dropdown-option:hover {
+  background-color: $maroon;
+  color: $white;
+
+  .all {
+    background-image: url('../../icons/a-to-z-white.svg');
+  }
+
+  .curricular {
+    background-image: url('../../icons/curricular-white.svg');
+  }
+
+  .interest {
+    background-image: url('../../icons/interest-white.svg');
+  }
+}
+
+.dropdown-option-icon {
+  width: 50px; /* Adjust width and height as needed */
+  height: 50px;
+  background-size: cover;
+
+  &.all {
+    background-image: url('../../icons/a-to-z-red.svg');
+  }
+
+  &.curricular {
+    background-image: url('../../icons/curricular-red.svg');
+  }
+
+  &.interest {
+    background-image: url('../../icons/interest-red.svg');
+  }
+}

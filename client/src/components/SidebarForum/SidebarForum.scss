@@ -1,0 +1,30 @@
+@import 'src/styles/index.scss';
+
+.sidebar__content {
+  display: flex;
+  flex-direction: column;
+  padding: t-rem(10);
+  padding-top: t-rem(30);
+  gap: t-rem(30);
+
+  h1 {
+    text-align: center;
+    font-weight: 900;
+    margin: 0;
+  }
+
+  @include bp-desktop {
+    grid-column: 1 / 4;
+    overflow-y: auto;
+    margin-right: t-rem(15);
+  }
+
+  @include bp-xl-desktop {
+    grid-column: 1 / 4;
+    margin-right: t-rem(30);
+  }
+
+  input {
+    max-width: 100%;
+  }
+}

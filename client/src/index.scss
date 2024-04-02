@@ -1,0 +1,37 @@
+@import 'src/styles/index.scss';
+
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background-color: $base-color;
+  color: $white;
+
+  scrollbar-width: thin;
+  scrollbar-color: $maroon-dark $deep-red;
+}
+
+::-webkit-scrollbar {
+  width: 15px;
+}
+
+::-webkit-scrollbar-thumb {
+  // lighter in maroon
+  background: $maroon;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: $maroon-dark;
+}
+
+a, p, h1, h2, h3, h4, h5, h6, ul, button {
+  margin: 0;
+  padding: 0;
+}
+
+*, ::before, ::after {
+  box-sizing: inherit;
+}
+
+html {
+  scroll-behavior: smooth;
+}

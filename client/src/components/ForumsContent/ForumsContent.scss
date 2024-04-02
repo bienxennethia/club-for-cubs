@@ -1,0 +1,20 @@
+@import 'src/styles/index.scss';
+
+.forums__content {
+  grid-column: 4 / -1;
+  background-color: $dark-red;
+  padding: t-rem(30);
+  flex: 1;
+  overflow-y: auto;
+  margin-top: t-rem(20);
+
+  @include bp-desktop {
+    grid-column: 4 / -1;
+    margin-top: 0;
+  }
+
+  @include bp-xl-desktop {
+    grid-column: 4 / -1;
+    margin-top: 0;
+  }
+}

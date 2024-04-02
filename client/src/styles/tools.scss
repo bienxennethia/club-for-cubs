@@ -1,0 +1,21 @@
+@mixin bp-xl-desktop {
+  @media screen and (min-width: 1400px) {
+    @content; // This will include the content of the mixin where it's called
+ }
+}
+
+@mixin bp-desktop {
+  @media screen and (min-width: 980px) {
+    @content; // This will include the content of the mixin where it's called
+ }
+}
+
+@mixin bp-tablet {
+  @media screen and (min-width: 640px) {
+    @content; // This will include the content of the mixin where it's called
+ }
+}
+
+@function  t-rem($value) {
+  @return calc($value / 16) + rem;
+}

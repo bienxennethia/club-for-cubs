@@ -1,0 +1,134 @@
+@import 'src/styles/index.scss';
+
+.login__title {
+  text-align: center;
+  font-size: t-rem(35);
+  margin: 0;
+  text-shadow: t-rem(-2) t-rem(5) t-rem(4) rgba(0, 0, 0, 0.5);
+  text-transform: uppercase;
+
+  @include bp-tablet {
+    font-size: t-rem(50);
+  }
+
+  @include bp-desktop {
+    font-size: t-rem(60);
+  }
+
+  @include bp-xl-desktop {
+    font-size: t-rem(70);
+  }
+}
+
+.login__content {
+  display: flex;
+  flex-direction: column;
+  gap: t-rem(20);
+  justify-content: center;
+  margin: t-rem(20) 0;
+
+  @include bp-tablet {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include bp-tablet {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+  }
+
+  @include bp-xl-desktop {
+    grid-template-columns: repeat(12, 1fr);
+    margin-top: t-rem(40);
+  }
+}
+
+.login__action {
+  border: 0;
+  text-transform: uppercase;
+  font-size: t-rem(40);
+  color: $white;
+  font-weight: bold;
+  padding: t-rem(50) 0;
+  border-radius: t-rem(10);
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  cursor: pointer;
+
+  svg {
+    position: absolute;
+    width: t-rem(350);
+    height: t-rem(350);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+
+    @include bp-tablet {
+      width: t-rem(250);
+      height: t-rem(250);
+    }
+
+    @include bp-desktop {
+      width: t-rem(275);
+      height: t-rem(275);
+    }
+  }
+
+  &:first-of-type {
+    background-color: $deep-red;
+
+    svg {
+      fill: $dark-red;
+    }
+
+    &:hover {
+      background-color: $dark-red;
+
+      svg {
+        fill: $deep-red;
+      }
+    }
+
+    @include bp-tablet {
+      grid-column: 1 / 5;
+    }
+
+    @include bp-desktop {
+      grid-column: 2 / 5;
+    }
+
+    @include bp-xl-desktop {
+      grid-column: 3 /7;
+    }
+  }
+  
+  &:last-of-type {
+    background-color: $maroon;
+
+    svg {
+      fill: $deep-red;
+    }
+
+    &:hover {
+      background-color: $deep-red;
+
+      svg {
+        fill: $maroon;
+      }
+    }
+
+    @include bp-tablet {
+      grid-column: 5 / -1;
+    }
+
+    @include bp-desktop {
+      grid-column: 5 / 8;
+    }
+
+    @include bp-xl-desktop {
+      grid-column: 7 / 11;
+    }
+  }
+}

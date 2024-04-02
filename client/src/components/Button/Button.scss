@@ -1,0 +1,24 @@
+@import 'src/styles/index.scss';
+
+.button {
+  position: fixed;
+  bottom: t-rem(20);
+  right: t-rem(20);
+  z-index: 999;
+  padding: t-rem(10);
+  background-color: $deep-red;
+  border: t-rem(1) solid $maroon;
+  border-radius: 100%;
+  cursor: pointer;
+
+  svg {
+    width: t-rem(50);
+    height: auto;
+    stroke: $maroon;
+  }
+}
+
+/* Additional styling for button on hover */
+.button:hover {
+  background-color: $dark-red;
+}

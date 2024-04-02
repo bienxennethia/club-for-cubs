@@ -1,0 +1,120 @@
+@import 'src/styles/index.scss';
+
+.clubs__container {
+  display: flex;
+  flex-direction: column;
+  gap: t-rem(30);
+}
+
+.clubs__header {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: t-rem(20);
+
+  @include bp-tablet {
+    flex-direction: row;
+  }
+}
+
+.clubs__title {
+  font-size: t-rem(70);
+  margin: 0;
+  font-weight: 900;
+
+  @include bp-desktop {
+    font-size: t-rem(100);
+  }
+}
+
+.clubs__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: t-rem(30);
+}
+
+.clubs__item {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  text-decoration: none;
+  color: $white;
+  position: relative;
+  flex: 100% 1;
+
+  &:hover .clubs__item-content::before {
+    background-color: rgba($maroon, 0.5);
+  }
+
+  @include bp-tablet {
+    flex: 33%;
+  }
+
+  @include bp-desktop {
+    flex: 48%;
+  }
+}
+
+.clubs__item-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  border-radius: t-rem(30);
+  border: t-rem(1) solid $maroon;
+  overflow: hidden;
+  
+  background-size: cover;
+  background-position: center;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba($maroon, 0.8);
+  }
+}
+
+.clubs__image {
+  position: absolute;
+  z-index: -1;
+  svg {
+    width: 100%;
+    height: auto;
+  }
+}
+
+.clubs__text {
+  padding: t-rem(60) t-rem(20);
+  font-weight: 900;
+  font-size: t-rem(30);
+  z-index: 1;
+  text-align: center;
+
+  @include bp-tablet {
+    padding: t-rem(60) t-rem(10);
+  }
+
+  @include bp-desktop {
+    font-size: t-rem(50);
+    padding: t-rem(120) t-rem(40);
+  }
+
+  @include bp-desktop {
+    font-size: t-rem(60);
+    padding: t-rem(120) t-rem(40);
+  }
+}
+
+.clubs__delete-text {
+  color: $white;
+  background-color: $maroon;
+  padding: t-rem(20) t-rem(15);
+  border-radius: t-rem(10);
+  animation: slideIn 0.3s forwards, slideOut 0.3s forwards 8.5s;
+  margin-bottom: t-rem(20);
+}

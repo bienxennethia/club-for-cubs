@@ -1,0 +1,242 @@
+@import 'src/styles/index.scss';
+
+.modal {
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+  z-index: 9999;
+}
+
+.modal__close-btn {
+  display: flex;
+  position: absolute;
+  top: t-rem(20);
+  right: t-rem(20);
+  cursor: pointer;
+  color: $maroon;
+  padding: t-rem(5);
+  background-color: $deep-red;
+  border: t-rem(5) solid $maroon;
+  border-radius: 100%;
+
+  svg {
+    fill: $maroon;
+    width: t-rem(50);
+    height: auto;
+  }
+
+  &:hover {
+    background-color: $dark-red;
+  }
+}
+
+.modal__container {
+  margin: 0 t-rem(20);
+
+  @include bp-tablet {
+    margin: 0 auto;
+    max-width: t-rem(768);
+  }
+
+  @include bp-desktop {
+    max-width: t-rem(980);
+  }
+
+  @include bp-xl-desktop {
+    max-width: t-rem(1200);
+  }
+}
+
+.modal__container-content {
+  overflow-y: auto;
+  position: relative;
+  background-color: $maroon;
+  border-radius: t-rem(30);
+  min-height: calc(100vh - t-rem(120));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: t-rem(20);
+  padding: t-rem(30);
+
+  @include bp-tablet {
+    min-height: calc(100vh - t-rem(123));
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 0;
+    padding: t-rem(30);
+  }
+  
+  @include bp-desktop {
+    min-height: calc(100vh - t-rem(158));
+    align-items: center;
+  }
+  
+  @include bp-xl-desktop {
+    min-height: calc(100vh - t-rem(178));
+    grid-template-columns: repeat(16, 1fr);
+  }
+}
+
+
+.modal__logo,
+.modal__content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.modal__logo {
+  width: 100%;
+  height: 100%;
+
+  svg {
+    width: calc(100% - t-rem(50));
+    height: auto;
+    max-width: t-rem(250);
+  }
+
+  @include bp-tablet {
+    grid-column: 1 / 6;
+
+    svg {
+      width: 80%;
+      max-width: initial;
+    }
+  }
+
+  @include bp-desktop {
+    grid-column: 1 / 6;
+  }
+
+  @include bp-xl-desktop {
+    grid-column: 2 / 8;
+  }
+}
+
+.modal__content {
+  text-align: center;
+  align-items: stretch;
+
+  svg {
+    width: 100%;
+    height: auto;
+  }
+
+  @include bp-tablet {
+    grid-column: 6 / -1;
+    margin-left: t-rem(15);
+  }
+
+  @include bp-desktop {
+    grid-column: 6 / -1;
+    margin-left: t-rem(30);
+  }
+
+  @include bp-xl-desktop {
+    grid-column: 8 / -2;
+  }
+}
+
+.modal__fields {
+  margin-top: t-rem(20);
+}
+
+
+.modal__header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.modal__title {
+  font-size: t-rem(40);
+  font-weight: 900;
+  margin: 0;
+
+  @include bp-desktop {
+    font-size: t-rem(70);
+  }
+
+  @include bp-xl-desktop {
+    font-size: t-rem(60);
+  }
+
+  .modal--login & {
+    font-size: t-rem(70);
+
+    @include bp-tablet {
+      font-size: t-rem(75);
+    }
+
+    @include bp-desktop {
+      font-size: t-rem(90);
+    }
+  }
+}
+
+.modal__subtitle {
+  font-size: t-rem(25);
+  font-weight: 900;
+  margin-top: t-rem(-15);
+
+  @include bp-desktop {
+    font-size: t-rem(35);
+    margin-top: t-rem(-20);
+  }
+}
+
+.modal__description {
+  font-size: t-rem(10);
+  font-weight: 300;
+  text-align: left;
+  letter-spacing: t-rem(2);
+
+  & + & {
+    margin-top: t-rem(10);
+  }
+
+  @include bp-desktop {
+    letter-spacing: t-rem(2);
+  }
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: t-rem(10);
+  margin-top: t-rem(30);
+
+  .modal--delete & {
+    justify-content: center;
+  }
+}
+
+.modal__btn {
+  padding: t-rem(10);
+  width: 100%;
+  max-width: t-rem(150);
+  border: t-rem(1) solid $maroon;
+  border-radius: t-rem(20);
+  background-color: $deep-red;
+  color: $maroon;
+  font-size: t-rem(16);
+  font-weight: bold;
+  color: $white;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $dark-red;
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

@@ -1,0 +1,148 @@
+@import 'src/styles/index.scss';
+
+.club__content {
+  background-color: $maroon;
+  border-radius: t-rem(30);
+  padding: t-rem(30);
+  margin-top: t-rem(30);
+
+  &-header {
+    margin-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+.club__header-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: t-rem(20);
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: t-rem(1);
+    background-color: $white;
+    bottom: t-rem(-20);
+    left: 0;
+  }
+
+  @include bp-tablet {
+    align-items: flex-start;
+    flex-direction: row;
+  }
+}
+
+.club__header-image {
+  border-radius: 100%;
+  background-color: $dark-red;
+  padding: t-rem(30);
+
+  svg {
+    width: t-rem(100);
+    height: auto;
+    fill: $deep-red;
+  }
+
+  @include bp-desktop {
+    svg {
+      width: t-rem(120);
+    }
+  }
+}
+
+.club__header-title {
+  font-weight: 900;
+  font-size: t-rem(20);
+  text-transform: uppercase;
+  text-align: center;
+
+  @include bp-tablet {
+    font-size: t-rem(30);
+    text-align: left;
+  }
+
+  @include bp-desktop {
+    font-size: t-rem(40);
+  }
+
+  @include bp-xl-desktop {
+    font-size: t-rem(70);
+  }
+}
+
+.club__header-subtitle,
+.club__header-name {
+  font-weight: 900;
+  font-size: t-rem(15);
+
+  @include bp-tablet {
+    font-size: t-rem(20);
+  }
+
+  @include bp-desktop {
+    font-size: t-rem(25);
+  }
+
+  @include bp-xl-desktop {
+    font-size: t-rem(35);
+  }
+}
+
+.club__header-actions {
+  margin-top: t-rem(20);
+  display: flex;
+  gap: t-rem(20);
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 50%;
+    height: t-rem(10);
+    bottom: 0;
+    left: 0;
+    right: auto;
+    background-color: $deep-red;
+    border-radius: t-rem(5);
+    transition: left 0.3s ease-in-out;
+  }
+  
+  &.forum::after {
+    left: 50%;
+    right: auto;
+  }
+  
+  button {
+    color: $white;
+    background-color: $maroon;
+    border: 0;
+    width: 100%;
+    font-weight: 900;
+    padding: t-rem(20);
+    font-size: t-rem(15);
+    cursor: pointer;
+
+    &.active {
+      color: $deep-red;
+    }
+
+    @include bp-desktop {
+      font-size: t-rem(20);
+    }
+
+    @include bp-xl-desktop {
+      font-size: t-rem(30);
+    }
+  }
+}
+
+.club__content-about {
+  p {
+    &:not(:first-of-type) {
+      margin-top: t-rem(15);
+    }
+  }
+}

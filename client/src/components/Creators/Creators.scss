@@ -1,0 +1,130 @@
+@import 'src/styles/index.scss';
+
+.creators__container {
+  display: flex;
+  flex-direction: column;
+  gap: t-rem(30);
+}
+
+.creators__items {
+  display: flex;
+  flex-direction: column;
+  gap: t-rem(25);
+
+  @include bp-tablet {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    justify-items: center;
+    gap: t-rem(30) t-rem(20);
+  }
+
+  @include bp-xl-desktop {
+    display: flex;
+  }
+}
+
+.creators__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: t-rem(20);
+
+  @include bp-xl-desktop {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    justify-items: center;
+    gap: 0;
+  }
+}
+
+.creators__title {
+  text-align: center;
+  font-size: t-rem(35);
+  margin: 0;
+  text-shadow: t-rem(-2) t-rem(5) t-rem(4) rgba(0, 0, 0, 0.5);
+  text-transform: uppercase;
+
+  @include bp-tablet {
+    font-size: t-rem(60);
+  }
+
+  @include bp-desktop {
+    font-size: t-rem(90);
+  }
+
+  @include bp-xl-desktop {
+    font-size: t-rem(100);
+  }
+}
+
+.creators__image {
+  border-radius: 100%;
+  background-color: $maroon;
+  padding: t-rem(10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: t-rem(150);
+  height: t-rem(150);
+
+  svg {
+    width: t-rem(120);
+    height: auto;
+    fill: $deep-red;
+  }
+
+  @include bp-xl-desktop {
+    max-width: t-rem(285);
+    border-radius: 100%;
+    background-color: $maroon;
+    padding: t-rem(20);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-column: 1 / 6;
+    width: t-rem(250);
+    height: t-rem(250);
+
+    svg {
+      width: t-rem(200);
+      height: auto;
+      fill: $deep-red;
+    }
+  }
+}
+
+.creators__text {
+  grid-column: 6 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: t-rem(15);
+  justify-content: center;
+  align-items: center;
+
+  @include bp-xl-desktop {
+    margin-left: t-rem(-50);
+    align-items: baseline;
+  }
+}
+
+.creators__name {
+  text-transform: uppercase;
+  font-size: t-rem(30);
+  font-weight: bold;
+
+  @include bp-tablet {
+    font-size: t-rem(25);
+  }
+
+  @include bp-desktop {
+    font-size: t-rem(40);
+  }
+
+  @include bp-xl-desktop {
+    font-size: t-rem(60);
+  }
+}
+
+.creators__description {
+  text-align: justify;
+}
