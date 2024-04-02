@@ -9,7 +9,7 @@ export const creatorsData = [
     description: "Hi!! I'm Jaz, a contributor of this website whose role involves organizing data and assisting our leader in guiding the group. Excitedly, I engage in this project as it serves as a vital platform for disseminating information among students across various clubs. I firmly believe in the potential of this website to greatly benefit our school community. My enthusiasm for technology has propelled me towards this opportunity, and I am grateful to be part of such an impactful initiative."
   },
   {
-    name: "Dean Almarinez",
+    name: "Jared Almarinez",
     description: "Good day, I'm Dean Jared D. Almarinez, a contributor and researcher involved in this project. For this projects I had contributed with the concept, ideas and backing related studies used to be able to formulate the concept for this website. This website is a vital part and product of our research project to know it's effectiveness and impact.",
     image: "cubs-of-cubs.png"
   },

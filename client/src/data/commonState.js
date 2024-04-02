@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { modals } from '../components/Modal/modals';
+import { modals } from './modals';
 import { getClubs, getClubTypes, saveClubs, getForums, saveForum, updateForum, deleteForum, deleteClub, updateClub, login, getUsers } from './utils';
 const CommonStateContext = createContext();
 

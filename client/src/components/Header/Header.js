@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 
 import "./Header.scss";
 
-import { navigationItems } from './navigationItems';
+import { navigationItems } from '../../data/navigationItems.js';
 import { ReactComponent as Logo } from "../../icons/logo.svg";
 import { ReactComponent as HomeIcon } from "../../icons/home.svg";
 import { ReactComponent as ProfileIcon } from "../../icons/profile.svg";

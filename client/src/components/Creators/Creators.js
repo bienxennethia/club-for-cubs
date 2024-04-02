@@ -2,7 +2,7 @@ import React from "react";
 
 import "./Creators.scss";
 
-import { creatorsData } from "./creatorsItem";
+import { creatorsData } from "../../data/creatorsItem.js";
 import { ReactComponent as Profile } from "../../icons/profile.svg";
 
 const Creators = () => {
