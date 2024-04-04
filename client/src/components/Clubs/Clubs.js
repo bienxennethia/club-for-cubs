@@ -24,7 +24,7 @@ const Clubs = () => {
       <div className="clubs__container">
         <div className="clubs__header">
           <h2 className="clubs__title">CLUBS</h2>
-          <SelectField setType={setSelectedClubType} options={clubTypes} />
+          { clubTypes.length > 0 && <SelectField setType={setSelectedClubType} options={clubTypes} /> }
         </div>
         <div className="clubs__content">
           { warningMessage && warningMessage?.id?.includes("item") && <div className="clubs__delete-text">{warningMessage?.message}!</div>}

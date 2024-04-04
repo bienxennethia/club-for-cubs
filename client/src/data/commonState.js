@@ -32,13 +32,6 @@ export const CommonStateProvider = ({ children }) => {
   const [users, setUsers] = useState(null);
 
   useEffect(() => {
-    if (!isLoggedIn && !isVisitor) {
-      navigate('/');
-    }
-    
-  }, [isLoggedIn]);
-
-  useEffect(() => {
     const itemID = location.pathname.includes('item') ? location.pathname.split('/').pop() : null;
     
     fetchClubs({ id: itemID, type: selectedClubType });
@@ -46,13 +39,17 @@ export const CommonStateProvider = ({ children }) => {
 
   useEffect(() => {
     const verifyLoggedIn = getWithExpiry('isLoggedIn');
-    if (verifyLoggedIn === null) {
+    if (verifyLoggedIn !== null) {
+      fetchUsers({user_id: verifyLoggedIn?.user?.user_id});
+      setIsLoggedIn(verifyLoggedIn?.value === true);
+    } else {
       const verifyVisitor = getWithExpiry('isVisitor');
       setIsLoggedIn(false);
       setIsVisitor(verifyVisitor?.value === true);
-    } else {
-      fetchUsers({user_id: verifyLoggedIn?.user?.user_id});
-      setIsLoggedIn(verifyLoggedIn?.value === true);
+      
+      if (!verifyLoggedIn?.value && !verifyVisitor?.value) {
+        navigate('/');
+      }
     }
 
     const fetchClubTypes = async () => {
