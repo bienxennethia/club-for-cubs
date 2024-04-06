@@ -36,7 +36,7 @@ const SelectField = ({isForum = false, options = null, setType = null}) => {
   
 
   return (
-    <div className={`dropdown-container ${isForum ? 'isForums' : ''}`}>
+    (options.length > 0 || (isForum && options.length > 1)) && <div className={`dropdown-container ${isForum ? 'isForums' : ''}`}>
       <div className={`dropdown-header ${isOpen ? 'open' : ''}`} onClick={toggleDropdown}>
         {selectedOption ? selectedOption.name : options[0]?.name}
         <DownArrow />

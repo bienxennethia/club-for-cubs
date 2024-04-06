@@ -2,8 +2,7 @@ import React from "react";
 
 import "./Creators.scss";
 
-import { creatorsData } from "./creatorsItem";
-import { ReactComponent as Profile } from "../../icons/profile.svg";
+import { creatorsData } from "../../data/creatorsItem.js";
 
 const Creators = () => {
 
@@ -18,7 +17,7 @@ const Creators = () => {
             {creatorsData.map((creator, index) => (
               <div className="creators__item" key={index}>
                 <div className="creators__image">
-                  <Profile className="creators__logo" />
+                  {creator.image}
                 </div>
                 <div className="creators__text">
                   <h3 className="creators__name">{creator.name}</h3>
