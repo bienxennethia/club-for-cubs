@@ -13,6 +13,7 @@ import Button from './components/Button/Button';
 import { CommonStateProvider } from './data/commonState';
 
 import Modal from './components/Modal/Modal';
+import ImageUpload from './components/Modal/ImageUpload';
 
 function App() {
 
@@ -21,6 +22,7 @@ function App() {
       <CommonStateProvider>
         <div className="app">
           <Header />
+          <ImageUpload/>
           <div className={`content`}>
             <Routes>
               <Route path="/" element={<Home />} />
@@ -34,10 +36,7 @@ function App() {
           <Footer />
 
           <Button/>
-
-          {
-            <Modal/>
-          }
+          <Modal/>
         </div>
       </CommonStateProvider>
     </Router>
