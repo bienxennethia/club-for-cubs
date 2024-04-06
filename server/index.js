@@ -11,6 +11,6 @@ app.use(express.json());
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 const routes = require('./db/routes');
-app.use('/api', urlencodedParser, routes);
+app.use('/', urlencodedParser, routes);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
