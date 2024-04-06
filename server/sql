@@ -1,0 +1,59 @@
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE club_type_table (
+  id VARCHAR(255) PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+);
+
+CREATE TABLE club_table (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description VARCHAR(255) NOT NULL,
+  image VARCHAR(255) NOT NULL,
+  club_type_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  FOREIGN KEY (club_type_id) REFERENCES club_type_table(id)
+);
+
+CREATE TABLE forums_table (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description VARCHAR(255) NOT NULL,
+  image VARCHAR(255) NOT NULL,
+  club_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS user_table (
+    user_id SERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE user_table
+ADD COLUMN first_name VARCHAR(255),
+ADD COLUMN last_name VARCHAR(255),
+ADD COLUMN middle_name VARCHAR(255),
+ADD COLUMN year INT,
+ADD COLUMN section VARCHAR(50),
+ADD COLUMN image VARCHAR(255);
+
+
+CREATE TABLE IF NOT EXISTS clublist (
+    club_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    club_name VARCHAR(255) NOT NULL,
+    club_description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES user_table(user_id) ON DELETE CASCADE
+);
+
+INSERT INTO user_table (first_name, last_name, email, password, middle_name, year, section, image)
+VALUES ('John', 'Doe', 'admin@example.com', 'password123', 'Middle', '12', '', '');
