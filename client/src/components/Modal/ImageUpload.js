@@ -9,6 +9,7 @@ export default function ImageUpload() {
       <h1>Upload Your Avatar</h1>
  
       <form
+        method='POST'
         onSubmit={async (event) => {
           event.preventDefault();
  
