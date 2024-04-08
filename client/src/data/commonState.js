@@ -3,10 +3,11 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { modals } from './modals';
-import { getClubs, getClubTypes, saveClubs, getForums, saveForum, updateForum, deleteForum, deleteClub, updateClub, login, getUsers } from './utils';
+import { getClubs, getClubTypes, getForums, saveForum, updateForum, deleteForum, deleteClub, updateClub, getUsers } from './utils';
 const CommonStateContext = createContext();
 
 export const useCommonState = () => useContext(CommonStateContext);
+const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 // Common state provider component
 export const CommonStateProvider = ({ children }) => {
@@ -183,88 +184,145 @@ export const CommonStateProvider = ({ children }) => {
     }
   };
   
-  const toggleSave = async () => {
-    const fields = {};
-    let isValid = true;
+  // const toggleSave = async () => {
+  //   const fields = {};
+  //   let isValid = true;
   
-    modalContent?.content.fields.forEach(field => {
-      const inputElement = document.querySelector(`.fields-modal__input[name="${field.name}"]`);
-        if (inputElement) {
-        const value = inputElement.value.trim();
+  //   modalContent?.content.fields.forEach(field => {
+  //     const inputElement = document.querySelector(`.fields-modal__input[name="${field.name}"]`);
+  //       if (inputElement) {
+  //       const value = inputElement.value.trim();
 
-        if (field.type === 'email' && value !== '') {
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          if (!emailRegex.test(value)) {
-            isValid = false;
-            inputElement.nextElementSibling.textContent = 'Invalid email address';
-            inputElement.classList.add('error');
-            return;
-          }
-        }
+  //       if (field.type === 'email' && value !== '') {
+  //         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //         if (!emailRegex.test(value)) {
+  //           isValid = false;
+  //           inputElement.nextElementSibling.textContent = 'Invalid email address';
+  //           inputElement.classList.add('error');
+  //           return;
+  //         }
+  //       }
 
-        if (inputElement.required && value === '') {
-          isValid = false;
-          inputElement.classList.add('error');
-          inputElement.nextElementSibling.textContent = 'This field is required';
-          return;
-        } else {
-          fields[field.name] = value;
-          inputElement.classList.remove('error');
-          inputElement.nextElementSibling.textContent = '';
-        }
+  //       if (inputElement.required && value === '') {
+  //         isValid = false;
+  //         inputElement.classList.add('error');
+  //         inputElement.nextElementSibling.textContent = 'This field is required';
+  //         return;
+  //       } else {
+  //         fields[field.name] = value;
+  //         inputElement.classList.remove('error');
+  //         inputElement.nextElementSibling.textContent = '';
+  //       }
+  //     }
+  //   });
+  
+  //   if (isValid) {
+  //     let results = {};
+  //     let isEdit = false;
+  //     if (modalIdOpen === 'addClub') {
+  //       const { result } = await saveClubs(fields);
+  //       results = result;
+  //       setClubLists(result);
+  //     } else if (modalIdOpen === 'editClub') {
+  //       const { result } = await updateClub(modalContentId, fields);
+  //       results = result;
+  //       setClubLists(result);
+  //       isEdit = true;
+  //     } else if (modalIdOpen === 'addForumClub') {
+  //       const itemID = location.pathname.includes('item') ? location.pathname.split('/').pop() : null;
+  //       const { result } = await saveForum({...fields, club_id: itemID});
+  //       fetchClubs({id: itemID});
+  //       fetchForums({clubId: itemID});
+  //       results = result;
+  //     }else if (modalIdOpen === 'addForum') {
+  //       const { result } = await saveForum(fields);
+  //       results = result;
+  //       fetchForums({id: null, interestType, curricularType, searchString});
+  //     } else if (modalIdOpen === 'editForum') {
+  //       const { result } = await updateForum(modalContentId, fields);
+  //       results = result;
+  //       fetchForums({id: null, interestType, curricularType, searchString});
+  //       isEdit = true;
+  //     } else if (modalIdOpen === 'login') {
+  //       const { user, message } = await login({...fields});
+  //       if (user) {
+  //         setResponse({id: currentPage, message: "Login successfully!"});
+  //         setUsers(user);
+  //         setIsLoggedIn(true);
+  //         setTimeout(() => {
+  //           closeModal();
+  //         }, 3000);
+  //         setWithExpiry('isLoggedIn', true, 1 * 24 * 60 * 60 * 1000, { ...user, password: null, email: null });
+  //         localStorage.removeItem('isVisitor');
+  //       } else {
+  //         setResponse({id: currentPage, message: message});
+  //       }
+  //       return;
+  //     }
+
+  //     if (results) {
+  //       setResponse({id: currentPage, message: isEdit ? 'Updated successfully!' : 'Saved successfully!'});
+  //       clearFields();
+  //     } else {
+  //       setResponse({id: currentPage, message: isEdit ? 'Failed to update.' : 'Failed to save.'});
+  //     }
+  //   }
+  // };
+
+
+  const toggleSave = async (event, imageField = null) => {
+    try {
+      event.preventDefault();
+  
+      const formData = new FormData(event.target);
+
+      // Append imageField to formData if it exists
+      if (imageField) {
+        formData.append('image', imageField);
       }
-    });
-  
-    if (isValid) {
-      let results = {};
-      let isEdit = false;
-      if (modalIdOpen === 'addClub') {
-        const { result } = await saveClubs(fields);
-        results = result;
-        setClubLists(result);
-      } else if (modalIdOpen === 'editClub') {
-        const { result } = await updateClub(modalContentId, fields);
-        results = result;
-        setClubLists(result);
-        isEdit = true;
-      } else if (modalIdOpen === 'addForumClub') {
-        const itemID = location.pathname.includes('item') ? location.pathname.split('/').pop() : null;
-        const { result } = await saveForum({...fields, club_id: itemID});
-        fetchClubs({id: itemID});
-        fetchForums({clubId: itemID});
-        results = result;
-      }else if (modalIdOpen === 'addForum') {
-        const { result } = await saveForum(fields);
-        results = result;
-        fetchForums({id: null, interestType, curricularType, searchString});
-      } else if (modalIdOpen === 'editForum') {
-        const { result } = await updateForum(modalContentId, fields);
-        results = result;
-        fetchForums({id: null, interestType, curricularType, searchString});
-        isEdit = true;
-      } else if (modalIdOpen === 'login') {
-        const { user, message } = await login({...fields});
-        if (user) {
-          setResponse({id: currentPage, message: "Login successfully!"});
-          setUsers(user);
+
+      const requestOptions = {
+        method: modalContent?.method,
+        body: formData,
+      };
+
+      if (modalIdOpen === "login") {
+        requestOptions.headers = {
+          'Content-Type': 'application/json'
+        }
+        const formValues = Object.fromEntries(formData);
+        requestOptions.body = JSON.stringify(formValues);
+      }
+      
+      await fetch(`${apiUrl}${modalContent?.path}`, requestOptions).then(response => {
+        if (!response.ok) {
+          setResponse({id: currentPage, message: modalContent?.errorMessage});
+        }
+        return response.json();
+      })
+      .then(data => {
+
+        if (modalIdOpen === 'login' && data?.user) {
+          setUsers(data?.user);
           setIsLoggedIn(true);
           setTimeout(() => {
             closeModal();
           }, 3000);
-          setWithExpiry('isLoggedIn', true, 1 * 24 * 60 * 60 * 1000, { ...user, password: null, email: null });
+          setWithExpiry('isLoggedIn', true, 1 * 24 * 60 * 60 * 1000, { ...data?.user});
           localStorage.removeItem('isVisitor');
-        } else {
-          setResponse({id: currentPage, message: message});
+        } else if (modalIdOpen === 'addClub') {
+          setClubLists(data?.result);
         }
-        return;
-      }
-
-      if (results) {
-        setResponse({id: currentPage, message: isEdit ? 'Updated successfully!' : 'Saved successfully!'});
-        clearFields();
-      } else {
-        setResponse({id: currentPage, message: isEdit ? 'Failed to update.' : 'Failed to save.'});
-      }
+        setResponse({id: currentPage, message: data?.message});
+        event.target.reset();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        setResponse({id: currentPage, message: 'Internal server error.'});
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      setResponse({id: currentPage, message: 'Internal server error.'});
     }
   };
 

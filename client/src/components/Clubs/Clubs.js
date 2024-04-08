@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 
 import "./Clubs.scss";
 
-import imageUrl from "../../images/background.jpg";
 import SelectField from "../Select/Select";
 
 import { useCommonState } from "../../data/commonState";
+const serverUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:3001";
 
 const Clubs = () => {
   const { clubLists: clubs, clubTypes, setSelectedClubType, warningMessage, setWarningMessage } = useCommonState();
@@ -33,7 +33,7 @@ const Clubs = () => {
             <div className="clubs__items">
               {clubs.map((item) => (
                 <Link to={`/item/${item.id}`} className="clubs__item" key={item.id}>
-                  <div className="clubs__item-content" style={{ backgroundImage: `url(${imageUrl})` }}>
+                  <div className="clubs__item-content" style={{ backgroundImage: `url(${serverUrl}${item.image})` }}>
                     <div className="clubs__text">{item.name}</div>
                   </div>
                 </Link>
