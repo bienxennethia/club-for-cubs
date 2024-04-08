@@ -1,13 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Cloudinary } from '@cloudinary/url-gen';
 
 import { modals } from './modals';
-import { getClubs, getClubTypes, getForums, saveForum, updateForum, deleteForum, deleteClub, updateClub, getUsers } from './utils';
+import { getForums, saveForum, updateForum, deleteForum, getUsers } from './utils';
 const CommonStateContext = createContext();
 
 export const useCommonState = () => useContext(CommonStateContext);
-const apiUrl = process.env.REACT_APP_API_BASE_URL;
+const apiUrl = "http://localhost:3001";
 
 // Common state provider component
 export const CommonStateProvider = ({ children }) => {
@@ -31,6 +32,7 @@ export const CommonStateProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isVisitor, setIsVisitor] = useState(false);
   const [users, setUsers] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const itemID = location.pathname.includes('item') ? location.pathname.split('/').pop() : null;
@@ -54,12 +56,20 @@ export const CommonStateProvider = ({ children }) => {
     }
 
     const fetchClubTypes = async () => {
-      try {
-        const result = await getClubTypes();
-        setClubTypes(result);
-      } catch (error) {
+      return fetch(`${apiUrl}/club-types`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch club types');
+        }
+        return response.json();
+      })
+      .then(data => {
+        setClubTypes(data?.result);
+      })
+      .catch(error => {
         console.error('Error fetching club types:', error);
-      }
+        throw error;
+      });
     };
     fetchClubTypes();
     addStyling(false);
@@ -112,6 +122,7 @@ export const CommonStateProvider = ({ children }) => {
       const modal = modals.find((modal) => modal.id === modalIdOpen);
       if (modalIdOpen === 'deleteForum' || modalIdOpen === 'deleteClub') {
         setIsDeleteModal(true);
+        setModalContent(modal);
       } else {
         const updatedFields = await Promise.all(modal.content.fields.map((field) => {
           let newFields = field;
@@ -158,12 +169,30 @@ export const CommonStateProvider = ({ children }) => {
   };
 
   const fetchClubs = async (params = null) => {
-    try {
-      const result = await getClubs(params);
-      setClubLists(result);
-    } catch (error) {
-      console.error('Error fetching clubs:', error);
+    let { id = null, type = null } = params;
+    if (type === 'all') { type = null; } 
+    
+    let url = `${apiUrl}/clubs`;
+    if (id) {
+      url += `?id=${id}`;
+    } else if (type) {
+      url += `?type=${type}`;
     }
+
+    return fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to fetch clubs');
+      }
+      return response.json();
+    })
+    .then(data => {
+      setClubLists(data?.result);
+    })
+    .catch(error => {
+      console.error('Error fetching clubs:', error);
+      throw error;
+    });
   };
 
   const fetchForums = async (params = null) => {
@@ -271,12 +300,12 @@ export const CommonStateProvider = ({ children }) => {
 
 
   const toggleSave = async (event, imageField = null) => {
+    setIsLoading(true);
     try {
       event.preventDefault();
   
       const formData = new FormData(event.target);
 
-      // Append imageField to formData if it exists
       if (imageField) {
         formData.append('image', imageField);
       }
@@ -293,8 +322,13 @@ export const CommonStateProvider = ({ children }) => {
         const formValues = Object.fromEntries(formData);
         requestOptions.body = JSON.stringify(formValues);
       }
+
+      let url = `${apiUrl}${modalContent?.path}`;
+      if (modalIdOpen === 'editClub' || modalIdOpen === 'editForum') {
+        url += `/${modalContentId}`;
+      }
       
-      await fetch(`${apiUrl}${modalContent?.path}`, requestOptions).then(response => {
+      await fetch(`${url}`, requestOptions).then(response => {
         if (!response.ok) {
           setResponse({id: currentPage, message: modalContent?.errorMessage});
         }
@@ -305,16 +339,46 @@ export const CommonStateProvider = ({ children }) => {
         if (modalIdOpen === 'login' && data?.user) {
           setUsers(data?.user);
           setIsLoggedIn(true);
-          setTimeout(() => {
-            closeModal();
-          }, 3000);
           setWithExpiry('isLoggedIn', true, 1 * 24 * 60 * 60 * 1000, { ...data?.user});
           localStorage.removeItem('isVisitor');
-        } else if (modalIdOpen === 'addClub') {
+        } else if (modalIdOpen === 'addClub' || modalIdOpen === 'editClub') {
           setClubLists(data?.result);
         }
         setResponse({id: currentPage, message: data?.message});
-        event.target.reset();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        setResponse({id: currentPage, message: 'Internal server error.'});
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      setResponse({id: currentPage, message: 'Internal server error.'});
+    } finally {
+      setIsLoading(false);
+      closeModal();
+    }
+  };
+
+  const deleteModal = async () => {
+    setIsLoading(true);
+    try {
+      const url = `${apiUrl}${modalContent?.path}/${modalContentId}`;
+      await fetch(url, {
+        method: 'PUT',
+      }).then(response => {
+        if (!response.ok) {
+          setResponse({id: currentPage, message: modalContent?.errorMessage});
+        }
+        return response.json();
+      })
+      .then(data => {
+        setIsLoading(false);
+        closeModal();
+        if (modalIdOpen === 'deleteClub' && data?.message) {
+          setWarningMessage({id: currentPage, message: data?.message});
+          fetchClubs({});
+          navigate('/clubs');
+        }
       })
       .catch(error => {
         console.error('Error:', error);
@@ -324,23 +388,14 @@ export const CommonStateProvider = ({ children }) => {
       console.error('Error:', error);
       setResponse({id: currentPage, message: 'Internal server error.'});
     }
-  };
-
-  const deleteModal = async () => {
-    if (modalIdOpen === 'deleteClub') {
-      const { message } = await deleteClub(modalContentId);
-      if (message) {
-        setWarningMessage({id: currentPage, message: message});
-        navigate('/clubs');
-      }
-    } else if (modalIdOpen === 'deleteForum') {
-      const { message } = await deleteForum(modalContentId);
-      if (message) {
-        setWarningMessage({id: currentPage, message: message});
-        fetchForums({id: null, interestType, curricularType, searchString});
-        navigate('/forums');
-      }
-    }
+    // } else if (modalIdOpen === 'deleteForum') {
+    //   const { message } = await deleteForum(modalContentId);
+    //   if (message) {
+    //     setWarningMessage({id: currentPage, message: message});
+    //     fetchForums({id: null, interestType, curricularType, searchString});
+    //     navigate('/forums');
+    //   }
+    // }
   };
 
   const closeModal = () => {
@@ -407,6 +462,15 @@ export const CommonStateProvider = ({ children }) => {
     localStorage.removeItem('isLoggedIn');
   };
 
+  const getImage = (image) => {
+    const cld = new Cloudinary({
+      cloud: {
+        cloudName: "dl1braci9"
+      }
+    }); 
+    return cld.image(image).toURL();
+  }
+
   return (
     <CommonStateContext.Provider value={{ 
       currentPage, setCurrentPage, 
@@ -427,6 +491,8 @@ export const CommonStateProvider = ({ children }) => {
       isLoggedIn, setIsLoggedIn,
       isVisitor, setIsVisitor,
       users, setUsers,
+      isLoading,
+      getImage,
       setWithExpiry, logout,
       toggleModal, closeModal, toggleSave, clearFields, deleteModal, visitorBtn }}>
       {children}

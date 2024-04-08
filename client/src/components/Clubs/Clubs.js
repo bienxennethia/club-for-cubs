@@ -6,10 +6,9 @@ import "./Clubs.scss";
 import SelectField from "../Select/Select";
 
 import { useCommonState } from "../../data/commonState";
-const serverUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:3001";
 
 const Clubs = () => {
-  const { clubLists: clubs, clubTypes, setSelectedClubType, warningMessage, setWarningMessage } = useCommonState();
+  const { clubLists: clubs, clubTypes, setSelectedClubType, warningMessage, setWarningMessage, response, setResponse, getImage } = useCommonState();
 
   useEffect(() => {
     if (warningMessage) {
@@ -18,6 +17,14 @@ const Clubs = () => {
       }, 5000);
     }
   }, [setWarningMessage, warningMessage]);
+
+  useEffect(() => {
+    if (response) {
+      setTimeout(() => {
+        setResponse(null);
+      }, 5000);
+    }
+  }, [setResponse, response]);
   
   return (
     <div className="clubs">
@@ -28,12 +35,13 @@ const Clubs = () => {
         </div>
         <div className="clubs__content">
           { warningMessage && warningMessage?.id?.includes("item") && <div className="clubs__delete-text">{warningMessage?.message}!</div>}
+          { response?.message && <div className="clubs__delete-text">{response?.message}!</div>}
           { clubs.length === 0 && <div className="clubs__text">No clubs found</div>}
           { clubs.length > 0 && 
             <div className="clubs__items">
               {clubs.map((item) => (
                 <Link to={`/item/${item.id}`} className="clubs__item" key={item.id}>
-                  <div className="clubs__item-content" style={{ backgroundImage: `url(${serverUrl}${item.image})` }}>
+                  <div className="clubs__item-content" style={{ backgroundImage: `url(${getImage(item.image)})` }}>
                     <div className="clubs__text">{item.name}</div>
                   </div>
                 </Link>

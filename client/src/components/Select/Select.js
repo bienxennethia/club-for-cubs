@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import "./Select.scss";
 import { ReactComponent as DownArrow } from "../../icons/arrow.svg";
-import { ReactComponent as Icon } from "../../icons/home.svg";
+import { useCommonState } from "../../data/commonState";
 
 const SelectField = ({isForum = false, options = null, setType = null}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
+  const {getImage} = useCommonState();
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -50,7 +51,7 @@ const SelectField = ({isForum = false, options = null, setType = null}) => {
                   className="dropdown-option"
                   onClick={() => handleOptionClick(option)}
                 >
-                <Icon />
+                  <div className={`dropdown-option-image ${option.id}`} style={{backgroundImage: `url(${getImage(option.image)})`}}></div>
                   {option.name}
                 </div>
               ) : (

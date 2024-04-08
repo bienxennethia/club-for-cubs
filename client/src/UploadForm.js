@@ -22,7 +22,6 @@ const UploadForm = () => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = () => {
-      console.log(imageUrl);
       setImageUrl(reader.result);
     };
   };

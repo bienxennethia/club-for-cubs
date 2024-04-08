@@ -111,3 +111,12 @@
     background-image: url('../../icons/interest-red.svg');
   }
 }
+
+.dropdown-option-image {
+  border-radius: 100%;
+  background-color: $dark-red;
+  background-position: center;
+  background-size: cover;
+  width: t-rem(50);
+  height: t-rem(50);
+}

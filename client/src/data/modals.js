@@ -248,7 +248,9 @@ export const modals = [
   },
   {
     id: "editClub",
-    path: "/item",
+    path: "/clubs",
+    method: "PUT",
+    errorMessage: "Failed to edit club. Please try again.",
     class: "modal--club",
     content: {
       title: "EDIT CLUB",
@@ -259,30 +261,37 @@ export const modals = [
           name: "type",
           required: true,
           type: "select",
+          label: "Club Type:",
           placeholder: "Select type",
-          options: []
+          options: [
+            { value: "/", label: "Select type" },
+          ]
         },
         {
           name: "name",
           required: true,
           type: "text",
-          placeholder: "Name"
+          label: "Club Name:",
+          placeholder: "Enter Club Name"
         },
         {
           name: "description",
           required: true,
           type: "textarea",
-          placeholder: "Description"
+          label: "Description:",
+          placeholder: "Enter Club Description"
         },
         {
           name: "mission",
           type: "textarea",
-          placeholder: "Mission"
+          label: "Mission:",
+          placeholder: "Enter Club Mission"
         },
         {
           name: "vision",
           type: "textarea",
-          placeholder: "Vision"
+          label: "Vision:",
+          placeholder: "Enter Club Vision"
         },
         {
           name: "image",
@@ -296,6 +305,9 @@ export const modals = [
   {
     id: "deleteClub",
     class: "modal--club",
+    path: "/clubs/delete",
+    method: "PUT",
+    errorMessage: "Failed to delete club. Please try again.",
     content: {}
   },
   {

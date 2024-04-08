@@ -39,17 +39,14 @@
   border-radius: 100%;
   background-color: $dark-red;
   padding: t-rem(30);
-
-  svg {
-    width: t-rem(100);
-    height: auto;
-    fill: $deep-red;
-  }
+  background-position: center;
+  background-size: cover;
+  width: t-rem(100);
+  height: t-rem(100);
 
   @include bp-desktop {
-    svg {
-      width: t-rem(120);
-    }
+    width: t-rem(150);
+    height: t-rem(150);
   }
 }
 

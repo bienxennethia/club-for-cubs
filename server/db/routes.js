@@ -3,6 +3,14 @@ const router = express.Router();
 const pool = require('./db');
 const jwt = require('jsonwebtoken');
 const cloudinary = require('../cloudinary/cloudinary');
+const multer = require('multer');
+const upload = multer({
+  limits: {
+    fieldSize: 10 * 1024 * 1024 
+  }
+});
+
+router.use(upload.any());
 
 const {
   clubTableQuery,
@@ -10,11 +18,23 @@ const {
   forumTableQuery
 } = require('./tableQueries');
 
+async function generateCloudinaryImage(image) {
+  try {
+    const uploadedImage = await cloudinary.uploader.upload(image, { folder: 'club_for_cubs' });
+
+    return uploadedImage?.public_id;
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    res.status(500).json({ message: 'Failed to upload image' });
+  }
+}
+
 router.get('/club-types', async (req, res) => {
   try {
     const query = 'SELECT * FROM club_type_table';
     const { rows } = await pool.query(query);
-    res.json(rows);
+    
+    res.status(200).json({result: rows, message: 'Fetched successfully'});
   } catch (err) {
     console.error('Error executing PostgreSQL query:', err);
     res.status(500).json({ message: 'Internal server error' });
@@ -54,20 +74,24 @@ router.get('/clubs', async (req, res) => {
 
   try {
     const { rows } = await pool.query(query, values);
-    res.json(rows);
+    res.status(200).json({result: rows, message: 'Fetched successfully'});
   } catch (err) {
     console.error('Error executing PostgreSQL query:', err);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
 
+
 router.post('/clubs', async (req, res) => {
-  const { name, description, type, mission, vision } = req.body;
-  const { file } = req;
-  const filename = file ? `/images/${file.filename}` : null;
+  const { name, description, type, mission, vision, image } = req.body;
 
   if (!name || !type) {
     return res.status(400).json({ message: 'Name and club type ID are required' });
+  }
+
+  let filename = '';
+  if (image) {
+    filename = await generateCloudinaryImage(image);
   }
 
   const query = 'INSERT INTO club_table (name, description, type, image, mission, vision) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *';
@@ -92,22 +116,30 @@ router.put('/clubs/:id', async (req, res) => {
     return res.status(400).json({ message: 'Name and club type ID are required' });
   }
 
-  const query = `
-    UPDATE club_table 
-    SET name = $1, description = $2, type = $3, image = $4, mission = $5, vision = $6 
-    WHERE id = $7 RETURNING *`;
+  let filename = '';
+  if (image) {
+    filename = await generateCloudinaryImage(image);
+  }
 
-  const values = [name, description, type, image, mission, vision, id];
+  let query;
+  let values;
+  if (filename) {
+    query = `
+      UPDATE club_table 
+      SET name = $1, description = $2, type = $3, image = $4, mission = $5, vision = $6 
+      WHERE id = $7 RETURNING *`;
+    values = [name, description, type, filename, mission, vision, id];
+  } else {
+    query = `
+      UPDATE club_table 
+      SET name = $1, description = $2, type = $3, mission = $4, vision = $5 
+      WHERE id = $6 RETURNING *`;
+    values = [name, description, type, mission, vision, id];
+  }
 
   try {
     const { rows } = await pool.query(query, values);
-    const fetchQuery = `
-      SELECT club_table.*, club_type_table.name AS type_name
-      FROM club_table 
-      LEFT JOIN club_type_table ON club_table.type = club_type_table.id  
-      WHERE club_table.id = $1`;
-    const { rows: club } = await pool.query(fetchQuery, [id]);
-    res.status(200).json({ message: 'Club updated successfully', result: club });
+    res.status(200).json({ message: 'Club updated successfully', result: rows });
   } catch (err) {
     console.error('Error executing PostgreSQL query:', err);
     res.status(500).json({ message: 'Internal server error' });
@@ -329,8 +361,6 @@ router.post('/upload', async (req, res) => {
     
   try {
     const uploadedImage = await cloudinary.uploader.upload(image, { folder: 'club_for_cubs' });
-
-    console.log(uploadedImage);
   
     res.status(200).json({ uploadedImage });
   } catch (error) {

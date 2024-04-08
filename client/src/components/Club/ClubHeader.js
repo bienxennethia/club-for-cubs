@@ -1,17 +1,15 @@
-import { ReactComponent as Logo } from "../../icons/profile.svg";
 import AdminBtn from "../AdminBtn/AdminBtn";
 import './Club.scss';
 
 import { useCommonState } from "../../data/commonState";
 
 const ClubHeader = ({handleTabs, activeTab}) => {
-  const { clubLists: clubData } = useCommonState();
+  const { clubLists: clubData, getImage } = useCommonState();
   
   return (
     <div className="club__content club__content-header">
       <div className="club__header-content">
-        <div className="club__header-image">
-          <Logo />
+        <div className="club__header-image" style={{ backgroundImage: `url(${getImage(clubData[0]?.image)})` }}>
         </div>
         <div className="club__header-text">
           {

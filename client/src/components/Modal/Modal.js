@@ -7,9 +7,9 @@ import SelectField from "./SelectField";
 import ImageUpload from "./ImageUpload";
 import { useCommonState } from "../../data/commonState";
 const Modal = () => {
-  const { modalIdOpen, modalContent, closeModal, response, toggleSave, clearFields, isDeleteModal, deleteModal, toggleModal } = useCommonState();
+  const { modalIdOpen, modalContent, closeModal, response, toggleSave, clearFields, isDeleteModal, deleteModal, toggleModal, isLoading } = useCommonState();
 
-  const [imageField, setImageField] = useState(null);
+  const [image, setImage] = useState(null);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleKeyDown = (event) => {
     if (event.key === 'Escape') {
@@ -25,22 +25,24 @@ const Modal = () => {
     };
   }, [handleKeyDown, closeModal]);
 
-  const handleImageSelect = (event) => {
-    const selectedImage = event.target.files[0];
-    if (selectedImage && selectedImage.type.startsWith('image/')) {
-      setImageField(selectedImage);
-    } else {
-      alert('Please select a valid image file (JPEG, PNG, GIF)');
+  const previewFiles = (file) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setImage(reader.result);
+    };
+  };
+
+  const handleImageChange = (event) => {
+    const selectedFile = event.target.files[0];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (selectedFile && allowedTypes.includes(selectedFile.type)) {
+      previewFiles(selectedFile);
     }
   };
 
   const clearFieldsHandler = () => {
     clearFields();
-  };
-  
-  const toggleDelete = async () => {
-    closeModal();
-    deleteModal();
   };
 
   const registerHandler = async () => {
@@ -65,7 +67,7 @@ const Modal = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    toggleSave(event, imageField);
+    toggleSave(event, image);
   };
 
   return (
@@ -107,19 +109,19 @@ const Modal = () => {
                         </label>
                       )
                     }
+                    {field.type === "file" && <ImageUpload field={field} handleImageChange={handleImageChange} />}
                     {field.type === "select" && <SelectField field={field} /> }
                     {(field.type === "text" || field.type === "textarea" || field.type === "password" || field.type === "email") && <InputField field={field} /> }
-                    {field.type === "file" && <ImageUpload field={field} handleImageSelect={handleImageSelect} />}
                   </div>
                 ))}
                 <div className="modal__footer">
                   <p className="modal__response">{response?.message}</p>
                 </div>
                 <div className="modal__actions">
-                  {modalContent?.id === "login" && <button className="modal__btn" onClick={registerHandler}>Register</button> 
+                  {modalContent?.id === "login" && <button className="modal__btn" onClick={registerHandler} disabled={isLoading}>Register</button> 
                   }
-                  <button className="modal__btn" disabled={modalIdOpen === 'profile' || modalIdOpen === 'signup'} type="submit">{getBtnText()}</button>
-                  <button className="modal__btn clear" onClick={clearFieldsHandler}>Clear</button>
+                  <button className="modal__btn" disabled={modalIdOpen === 'profile' || modalIdOpen === 'signup'} type="submit">{isLoading ? 'Loading...' : getBtnText()}</button>
+                  <button className="modal__btn clear" onClick={clearFieldsHandler} disabled={isLoading} >Clear</button>
                 </div>
               </form>
             </div>
@@ -130,8 +132,8 @@ const Modal = () => {
               <p>Are you sure you want to delete?</p>
               
               <div className="modal__actions">
-                    <button className="modal__btn" onClick={toggleDelete}>Yes</button>
-                    <button className="modal__btn clear" onClick={closeModal}>No</button>
+                    <button className="modal__btn" onClick={deleteModal} disabled={isLoading}>{isLoading ? 'Loading...' : 'Yes'}</button>
+                    <button className="modal__btn clear" onClick={closeModal} disabled={isLoading}>No</button>
                   </div>
             </div>
           }
