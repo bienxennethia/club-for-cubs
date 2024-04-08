@@ -2,19 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('./db');
 const jwt = require('jsonwebtoken');
-const multer = require('multer');
-const path = require('path');
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'public/images')
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.fieldname + "_" + Date.now() + path.extname(file.originalname));
-  }
-});
-
-const upload = multer({ storage: storage });
+const cloudinary = require('../cloudinary/cloudinary');
 
 const {
   clubTableQuery,
@@ -73,7 +61,7 @@ router.get('/clubs', async (req, res) => {
   }
 });
 
-router.post('/clubs', upload.single('image'), async (req, res) => {
+router.post('/clubs', async (req, res) => {
   const { name, description, type, mission, vision } = req.body;
   const { file } = req;
   const filename = file ? `/images/${file.filename}` : null;
@@ -336,18 +324,18 @@ router.get('/user', async (req, res) => {
   }
 });
 
-router.post('/upload', upload.single('image'), async (req, res) => {
-  // Access uploaded file via req.file
-  if (!req.file) {
-    return res.status(400).json({ message: 'File is required' });
-  }
-
+router.post('/upload', async (req, res) => {
+  const {image} = req.body;
+    
   try {
-    // Handle file upload logic
-    res.status(200).json({ message: 'File uploaded successfully' });
-  } catch (err) {
-    console.error('Error uploading file:', err);
-    res.status(500).json({ message: 'Internal server error' });
+    const uploadedImage = await cloudinary.uploader.upload(image, { folder: 'club_for_cubs' });
+
+    console.log(uploadedImage);
+  
+    res.status(200).json({ uploadedImage });
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    res.status(500).json({ message: 'Failed to upload image' });
   }
 });
 
