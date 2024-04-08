@@ -51,7 +51,7 @@ const UploadForm = () => {
     });
     const jsonString = JSON.stringify(jsonData);
 
-    fetch('http://localhost:3001/upload', {
+    fetch(`${process.env.REACT_APP_API_BASE_URL}/upload`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json' // Set content type to JSON
