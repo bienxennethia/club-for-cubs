@@ -2,6 +2,19 @@ const express = require('express');
 const router = express.Router();
 const pool = require('./db');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/images')
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.fieldname + "_" + Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
 
 const {
   clubTableQuery,
@@ -60,15 +73,17 @@ router.get('/clubs', async (req, res) => {
   }
 });
 
-router.put('/clubs', async (req, res) => {
-  const { name, description, type, image, mission, vision } = req.body;
+router.post('/clubs', upload.single('image'), async (req, res) => {
+  const { name, description, type, mission, vision } = req.body;
+  const { file } = req;
+  const filename = file ? `/images/${file.filename}` : null;
 
   if (!name || !type) {
     return res.status(400).json({ message: 'Name and club type ID are required' });
   }
 
   const query = 'INSERT INTO club_table (name, description, type, image, mission, vision) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *';
-  const values = [name, description, type, image, mission, vision];
+  const values = [name, description, type, filename, mission, vision];
 
   try {
     const { rows } = await pool.query(query, values);
@@ -258,33 +273,32 @@ router.post('/login', async (req, res) => {
   const { email, password, club_id } = req.body;
 
   try {
-    const userQuery = 'SELECT user_id, first_name, last_name, middle_name, email, year, section, email FROM user_table WHERE email = $1 AND password = $2';
-    const userResult = await pool.query(userQuery, [email, password]);
+    const userQuery = `
+      SELECT u.user_id, u.first_name, u.last_name, u.middle_name, u.year, u.section, u.email, c.*
+      FROM user_table u
+      LEFT JOIN clublist c ON u.user_id = c.user_id
+      WHERE u.email = $1 AND u.password = $2 AND c.club_id = $3`;
+      
+    const userResult = await pool.query(userQuery, [email, password, club_id]);
     const user = userResult.rows[0];
 
     if (!user) {
       return res.status(400).json({ message: 'Please verify the information provided and try again.' });
     }
 
-    const clubQuery = 'SELECT * FROM clublist WHERE user_id = $1 AND club_id = $2';
-    const clubResult = await pool.query(clubQuery, [user.user_id, club_id]);
-
-    if (!clubResult) {
-      return res.status(403).json({ message: 'Please verify the information provided and try again.' });
-    }
-
     // Generate JWT token
     const token = jwt.sign({ user_id: user.user_id }, 'tMhMoXMgaZPkYICDMyqLobeRBYV5yuBM');
 
     res.cookie('user_token', token, { maxAge: 2 * 24 * 60 * 60 * 1000, httpOnly: true }); // Expires in 7 days
-
-    // Return token and user details
-    res.status(200).json({ user, clublist: clubResult });
+    
+    // Return user details with club information
+    res.status(200).json({ user, message: 'Login successful!' });
   } catch (error) {
     console.error('Error logging in:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
 
 router.get('/user', async (req, res) => {
   const { user_id } = req.query;
@@ -321,5 +335,21 @@ router.get('/user', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+router.post('/upload', upload.single('image'), async (req, res) => {
+  // Access uploaded file via req.file
+  if (!req.file) {
+    return res.status(400).json({ message: 'File is required' });
+  }
+
+  try {
+    // Handle file upload logic
+    res.status(200).json({ message: 'File uploaded successfully' });
+  } catch (err) {
+    console.error('Error uploading file:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 
 module.exports = router;

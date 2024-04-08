@@ -156,6 +156,8 @@ export const modals = [
   {
     id: "login",
     path: "/login",
+    method: "POST",
+    errorMessage: "Failed to login. Please try again.",
     class: "modal--login",
     content: {
       title: "LOG IN",
@@ -190,6 +192,8 @@ export const modals = [
   {
     id: "addClub",
     path: "/clubs",
+    method: "POST",
+    errorMessage: "Failed to add club. Please try again.",
     class: "modal--clubs",
     content: {
       title: "ADD CLUB",
@@ -200,6 +204,7 @@ export const modals = [
           name: "type",
           required: true,
           type: "select",
+          label: "Club Type:",
           placeholder: "Select type",
           options: [
             { value: "/", label: "Select type" },
@@ -209,29 +214,34 @@ export const modals = [
           name: "name",
           required: true,
           type: "text",
-          placeholder: "Name"
+          label: "Club Name:",
+          placeholder: "Enter Club Name"
         },
         {
           name: "description",
           required: true,
           type: "textarea",
-          placeholder: "Description"
+          label: "Description:",
+          placeholder: "Enter Club Description"
         },
         {
           name: "mission",
           type: "textarea",
-          placeholder: "Mission"
+          label: "Mission:",
+          placeholder: "Enter Club Mission"
         },
         {
           name: "vision",
           type: "textarea",
-          placeholder: "Vision"
+          label: "Vision:",
+          placeholder: "Enter Club Vision"
         },
         {
           name: "image",
           type: "file",
           placeholder: "Club Image",
-          label: "Club Image:"
+          label: "Club Image:",
+          required: true
         }
       ]
     }

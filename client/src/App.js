@@ -34,10 +34,7 @@ function App() {
           <Footer />
 
           <Button/>
-
-          {
-            <Modal/>
-          }
+          <Modal/>
         </div>
       </CommonStateProvider>
     </Router>

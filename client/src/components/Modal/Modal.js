@@ -1,12 +1,15 @@
 import "./Modal.scss";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ReactComponent as Logo } from "../../icons/logo.svg";
 import { ReactComponent as Close } from "../../icons/close.svg";
 import InputField from "./InputField";
 import SelectField from "./SelectField";
+import ImageUpload from "./ImageUpload";
 import { useCommonState } from "../../data/commonState";
 const Modal = () => {
   const { modalIdOpen, modalContent, closeModal, response, toggleSave, clearFields, isDeleteModal, deleteModal, toggleModal } = useCommonState();
+
+  const [imageField, setImageField] = useState(null);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleKeyDown = (event) => {
     if (event.key === 'Escape') {
@@ -22,14 +25,19 @@ const Modal = () => {
     };
   }, [handleKeyDown, closeModal]);
 
-  const saveModalHandler = () => {
-    toggleSave();
+  const handleImageSelect = (event) => {
+    const selectedImage = event.target.files[0];
+    if (selectedImage && selectedImage.type.startsWith('image/')) {
+      setImageField(selectedImage);
+    } else {
+      alert('Please select a valid image file (JPEG, PNG, GIF)');
+    }
   };
 
   const clearFieldsHandler = () => {
     clearFields();
   };
-
+  
   const toggleDelete = async () => {
     closeModal();
     deleteModal();
@@ -53,6 +61,11 @@ const Modal = () => {
       default:
         return "Register";
     }
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    toggleSave(event, imageField);
   };
 
   return (
@@ -80,42 +93,35 @@ const Modal = () => {
                 }
                 <p className="modal__description">*required fields</p>
               </div>
-              <div className="modal__fields fields">
-                  {modalContent?.content.fields.map((field) => (
-                    <div className="fields-modal__field field" key={field.name}>
-                      {
-                        field.label && (
-                          <label className="fields-modal__label">
-                          <span className="fields-modal__label-text">{field.label} 
-                          {
-                            field.required && <span className="fields-modal__required">*</span>
-                          }
+              <form onSubmit={handleSubmit} className="modal__fields fields">
+                {modalContent?.content.fields.map((field) => (
+                  <div className="fields-modal__field field" key={field.name}>
+                    {
+                      field.label && (
+                        <label className="fields-modal__label">
+                          <span className="fields-modal__label-text">
+                            {field.label} 
+                            {field.required && <span className="fields-modal__required">*</span>}
                           </span> 
-                          {
-                            field.placeholderText && <span>({field.placeholderText})</span>
-                          }</label>
-                        )
-                      }
-                      {
-                        field.type === "select" ? (
-                          <SelectField field={field} />
-                        ) : (
-                          <InputField field={field} />
-                        )
-                      }
-                      <span className="fields-modal__error"></span>
-                    </div>
-                  ))}
-                  <div className="modal__footer">
-                    <p className="modal__response">{response?.message}</p>
-                  </div>
-                  <div className="modal__actions">
-                    {modalContent?.id === "login" && <button className="modal__btn" onClick={registerHandler}>Register</button> 
+                          {field.placeholderText && <span>({field.placeholderText})</span>}
+                        </label>
+                      )
                     }
-                    <button className="modal__btn" disabled={modalIdOpen === 'profile' || modalIdOpen === 'signup'} onClick={saveModalHandler}>{getBtnText()}</button>
-                    <button className="modal__btn clear" onClick={clearFieldsHandler}>Clear</button>
+                    {field.type === "select" && <SelectField field={field} /> }
+                    {(field.type === "text" || field.type === "textarea" || field.type === "password" || field.type === "email") && <InputField field={field} /> }
+                    {field.type === "file" && <ImageUpload field={field} handleImageSelect={handleImageSelect} />}
                   </div>
-              </div>
+                ))}
+                <div className="modal__footer">
+                  <p className="modal__response">{response?.message}</p>
+                </div>
+                <div className="modal__actions">
+                  {modalContent?.id === "login" && <button className="modal__btn" onClick={registerHandler}>Register</button> 
+                  }
+                  <button className="modal__btn" disabled={modalIdOpen === 'profile' || modalIdOpen === 'signup'} type="submit">{getBtnText()}</button>
+                  <button className="modal__btn clear" onClick={clearFieldsHandler}>Clear</button>
+                </div>
+              </form>
             </div>
           }
           {
