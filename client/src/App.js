@@ -13,6 +13,7 @@ import Button from './components/Button/Button';
 import { CommonStateProvider } from './data/commonState';
 
 import Modal from './components/Modal/Modal';
+import UploadForm from './UploadForm';
 
 function App() {
 
@@ -21,6 +22,8 @@ function App() {
       <CommonStateProvider>
         <div className="app">
           <Header />
+          <UploadForm />
+          
           <div className={`content`}>
             <Routes>
               <Route path="/" element={<Home />} />
