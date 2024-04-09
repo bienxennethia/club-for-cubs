@@ -68,6 +68,10 @@
   .isForums & {
     justify-content: flex-start;
     gap: t-rem(10);
+
+    &:first-of-type {
+      display: none;
+    }
   }
 
   svg {
@@ -77,6 +81,7 @@
   }
 }
 
+.dropdown-option.selected,
 .dropdown-option:hover {
   background-color: $maroon;
   color: $white;

@@ -13,6 +13,11 @@ const SelectField = ({isForum = false, options = null, setType = null}) => {
   };
 
   const handleOptionClick = (option) => {
+    if (isForum && selectedOption && selectedOption.id === option.id) {
+      setType && setType(null);
+      setSelectedOption(null);
+      return;
+    }
     setType && setType(option.id);
     setSelectedOption(option);
     setIsOpen(false);
@@ -37,7 +42,7 @@ const SelectField = ({isForum = false, options = null, setType = null}) => {
   
 
   return (
-    (options.length > 0 || (isForum && options.length > 1)) && <div className={`dropdown-container ${isForum ? 'isForums' : ''}`}>
+    ((!isForum && options.length > 0) || (isForum && options.length > 1)) && <div className={`dropdown-container ${isForum ? 'isForums' : ''}`}>
       <div className={`dropdown-header ${isOpen ? 'open' : ''}`} onClick={toggleDropdown}>
         {selectedOption ? selectedOption.name : options[0]?.name}
         <DownArrow />
@@ -48,7 +53,7 @@ const SelectField = ({isForum = false, options = null, setType = null}) => {
               isForum ? (
                 <div
                   key={option.id}
-                  className="dropdown-option"
+                  className={`dropdown-option ${option.id === selectedOption?.id ? 'selected' : ''}`}
                   onClick={() => handleOptionClick(option)}
                 >
                   <div className={`dropdown-option-image ${option.id}`} style={{backgroundImage: `url(${getImage(option.image)})`}}></div>
