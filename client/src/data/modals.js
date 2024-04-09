@@ -59,12 +59,6 @@ export const modals = [
           name: "section",
           placeholder: "Enter your section",
           type: "text"
-        },
-        {
-          name: "image",
-          type: "file",
-          placeholder: "Image",
-          label: "Image:"
         }
       ]
     }
@@ -143,12 +137,6 @@ export const modals = [
           name: "section",
           placeholder: "Enter your section",
           type: "text"
-        },
-        {
-          name: "image",
-          type: "file",
-          placeholder: "Image",
-          label: "Image:"
         }
       ]
     }
