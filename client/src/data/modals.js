@@ -167,7 +167,6 @@ export const modals = [
         {
           label: "Club Name:",
           name: "club_id",
-          required: true,
           placeholderText: "Select the name of the Club officiating below",
           type: "select",
           options: []

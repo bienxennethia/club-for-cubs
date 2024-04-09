@@ -162,6 +162,10 @@
     opacity: 0.5; /* Example styling for a disabled NavLink */
     pointer-events: none; /* Disables pointer events on the NavLink */
   }
+
+  a.hideForums {
+    display: none;
+  }
 }
 
 .navigation__link--text {

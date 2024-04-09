@@ -26,7 +26,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<AboutUs />} />
               <Route path="/clubs" element={<Clubs />} />
-              {/* <Route path="/forums" element={<Forums />}/> */}
+              <Route path="/forums" element={<Forums />}/>
               <Route path="/item/:id" element={<Club />} />
             </Routes>
             <div className='content__background'></div>

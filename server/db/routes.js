@@ -290,14 +290,21 @@ router.delete('/forums/:id', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-  const { email, password, club_id } = req.body;
+  let { email, password, club_id } = req.body;
+
+  if (!club_id) {
+    club_id = '0'
+  }
 
   try {
     const userQuery = `
-      SELECT u.user_id, u.first_name, u.last_name, u.middle_name, u.year, u.section, u.email, c.*
-      FROM user_table u
-      LEFT JOIN clublist c ON u.user_id = c.user_id
-      WHERE u.email = $1 AND u.password = $2 AND c.club_id = $3`;
+    SELECT u.user_id, u.first_name, u.last_name, u.middle_name, u.year, u.section, u.email, c.*
+    FROM user_table u
+    LEFT JOIN clublist c ON u.user_id = c.user_id
+    WHERE u.email = $1 AND u.password = $2 AND 
+        (u.access = 'admin' OR 
+         (u.access <> 'admin' AND c.club_id = $3))`;
+
       
     const userResult = await pool.query(userQuery, [email, password, club_id]);
     const user = userResult.rows[0];

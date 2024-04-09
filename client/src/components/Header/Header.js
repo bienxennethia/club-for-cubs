@@ -11,7 +11,7 @@ import { ReactComponent as ProfileIcon } from "../../icons/profile.svg";
 import {useCommonState} from "../../data/commonState";
 
 const Header = () => {
-  const { isLoggedIn, isVisitor, setModalIdOpen, modalIdOpen, logout } = useCommonState();
+  const { isLoggedIn, isVisitor, setModalIdOpen, modalIdOpen, logout, clubLists } = useCommonState();
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isMobile, setMobile] = useState(false);
   const location = useLocation();
@@ -86,6 +86,7 @@ const Header = () => {
                     [
                       isActive || (item.link === '/clubs' && location.pathname.includes('/item')) ? "active" : "",
                       !isLoggedIn && !isVisitor ? "disabled" : "",
+                      item.link === '/forums' && clubLists.length === 0 ? "hideForums" : ""
                     ].join(" ")}to={item.link} onClick={closeMenu} title={item.name}>
                     <div className="navigation__link">
                       <span className='navigation__link--text'>{item.name}</span>

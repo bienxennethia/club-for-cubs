@@ -301,6 +301,7 @@ export const CommonStateProvider = ({ children }) => {
 
   const toggleSave = async (event, imageField = null) => {
     setIsLoading(true);
+    let isSuccess = false;
     try {
       event.preventDefault();
   
@@ -341,8 +342,10 @@ export const CommonStateProvider = ({ children }) => {
           setIsLoggedIn(true);
           setWithExpiry('isLoggedIn', true, 1 * 24 * 60 * 60 * 1000, { ...data?.user});
           localStorage.removeItem('isVisitor');
+          isSuccess = true;
         } else if (modalIdOpen === 'addClub' || modalIdOpen === 'editClub') {
           setClubLists(data?.result);
+          isSuccess = true;
         }
         setResponse({id: currentPage, message: data?.message});
       })
@@ -355,7 +358,10 @@ export const CommonStateProvider = ({ children }) => {
       setResponse({id: currentPage, message: 'Internal server error.'});
     } finally {
       setIsLoading(false);
-      closeModal();
+      
+      if (isSuccess) {
+        closeModal();
+      }
     }
   };
 
