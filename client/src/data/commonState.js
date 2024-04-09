@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Cloudinary } from '@cloudinary/url-gen';
 
 import { modals } from './modals';
-import { getForums, saveForum, updateForum, deleteForum, getUsers } from './utils';
+import { getForums, deleteForum, getUsers } from './utils';
 const CommonStateContext = createContext();
 
 export const useCommonState = () => useContext(CommonStateContext);
@@ -212,92 +212,6 @@ export const CommonStateProvider = ({ children }) => {
       console.error('Error fetching users:', error);
     }
   };
-  
-  // const toggleSave = async () => {
-  //   const fields = {};
-  //   let isValid = true;
-  
-  //   modalContent?.content.fields.forEach(field => {
-  //     const inputElement = document.querySelector(`.fields-modal__input[name="${field.name}"]`);
-  //       if (inputElement) {
-  //       const value = inputElement.value.trim();
-
-  //       if (field.type === 'email' && value !== '') {
-  //         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  //         if (!emailRegex.test(value)) {
-  //           isValid = false;
-  //           inputElement.nextElementSibling.textContent = 'Invalid email address';
-  //           inputElement.classList.add('error');
-  //           return;
-  //         }
-  //       }
-
-  //       if (inputElement.required && value === '') {
-  //         isValid = false;
-  //         inputElement.classList.add('error');
-  //         inputElement.nextElementSibling.textContent = 'This field is required';
-  //         return;
-  //       } else {
-  //         fields[field.name] = value;
-  //         inputElement.classList.remove('error');
-  //         inputElement.nextElementSibling.textContent = '';
-  //       }
-  //     }
-  //   });
-  
-  //   if (isValid) {
-  //     let results = {};
-  //     let isEdit = false;
-  //     if (modalIdOpen === 'addClub') {
-  //       const { result } = await saveClubs(fields);
-  //       results = result;
-  //       setClubLists(result);
-  //     } else if (modalIdOpen === 'editClub') {
-  //       const { result } = await updateClub(modalContentId, fields);
-  //       results = result;
-  //       setClubLists(result);
-  //       isEdit = true;
-  //     } else if (modalIdOpen === 'addForumClub') {
-  //       const itemID = location.pathname.includes('item') ? location.pathname.split('/').pop() : null;
-  //       const { result } = await saveForum({...fields, club_id: itemID});
-  //       fetchClubs({id: itemID});
-  //       fetchForums({clubId: itemID});
-  //       results = result;
-  //     }else if (modalIdOpen === 'addForum') {
-  //       const { result } = await saveForum(fields);
-  //       results = result;
-  //       fetchForums({id: null, interestType, curricularType, searchString});
-  //     } else if (modalIdOpen === 'editForum') {
-  //       const { result } = await updateForum(modalContentId, fields);
-  //       results = result;
-  //       fetchForums({id: null, interestType, curricularType, searchString});
-  //       isEdit = true;
-  //     } else if (modalIdOpen === 'login') {
-  //       const { user, message } = await login({...fields});
-  //       if (user) {
-  //         setResponse({id: currentPage, message: "Login successfully!"});
-  //         setUsers(user);
-  //         setIsLoggedIn(true);
-  //         setTimeout(() => {
-  //           closeModal();
-  //         }, 3000);
-  //         setWithExpiry('isLoggedIn', true, 1 * 24 * 60 * 60 * 1000, { ...user, password: null, email: null });
-  //         localStorage.removeItem('isVisitor');
-  //       } else {
-  //         setResponse({id: currentPage, message: message});
-  //       }
-  //       return;
-  //     }
-
-  //     if (results) {
-  //       setResponse({id: currentPage, message: isEdit ? 'Updated successfully!' : 'Saved successfully!'});
-  //       clearFields();
-  //     } else {
-  //       setResponse({id: currentPage, message: isEdit ? 'Failed to update.' : 'Failed to save.'});
-  //     }
-  //   }
-  // };
-
 
   const toggleSave = async (event, imageField = null) => {
     setIsLoading(true);
@@ -346,6 +260,9 @@ export const CommonStateProvider = ({ children }) => {
         } else if (modalIdOpen === 'addClub' || modalIdOpen === 'editClub') {
           setClubLists(data?.result);
           isSuccess = true;
+        } else if (modalIdOpen === 'addForum' || modalIdOpen === 'editForum') {
+          fetchForums({id: null, interestType, curricularType, searchString});
+          isSuccess = true;
         }
         setResponse({id: currentPage, message: data?.message});
       })
@@ -358,7 +275,7 @@ export const CommonStateProvider = ({ children }) => {
       setResponse({id: currentPage, message: 'Internal server error.'});
     } finally {
       setIsLoading(false);
-      
+
       if (isSuccess) {
         closeModal();
       }
@@ -370,7 +287,7 @@ export const CommonStateProvider = ({ children }) => {
     try {
       const url = `${apiUrl}${modalContent?.path}/${modalContentId}`;
       await fetch(url, {
-        method: 'PUT',
+        method: modalContent?.method,
       }).then(response => {
         if (!response.ok) {
           setResponse({id: currentPage, message: modalContent?.errorMessage});
@@ -384,6 +301,10 @@ export const CommonStateProvider = ({ children }) => {
           setWarningMessage({id: currentPage, message: data?.message});
           fetchClubs({});
           navigate('/clubs');
+        } else if (modalIdOpen === 'deleteForum' && data?.message) {
+          setWarningMessage({id: currentPage, message: data?.message});
+          fetchForums({id: null, interestType, curricularType, searchString});
+          navigate('/forums');
         }
       })
       .catch(error => {
@@ -394,14 +315,6 @@ export const CommonStateProvider = ({ children }) => {
       console.error('Error:', error);
       setResponse({id: currentPage, message: 'Internal server error.'});
     }
-    // } else if (modalIdOpen === 'deleteForum') {
-    //   const { message } = await deleteForum(modalContentId);
-    //   if (message) {
-    //     setWarningMessage({id: currentPage, message: message});
-    //     fetchForums({id: null, interestType, curricularType, searchString});
-    //     navigate('/forums');
-    //   }
-    // }
   };
 
   const closeModal = () => {
@@ -473,7 +386,8 @@ export const CommonStateProvider = ({ children }) => {
       cloud: {
         cloudName: "dl1braci9"
       }
-    }); 
+    });
+
     return cld.image(image).toURL();
   }
 

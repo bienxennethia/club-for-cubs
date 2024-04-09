@@ -204,62 +204,64 @@ router.get('/forums', async (req, res) => {
   }
 });
 
-router.put('/forums', async (req, res) => {
-  const { club_id, forum_name, forum_description, forum_image } = req.body;
+router.post('/forums', async (req, res) => {
+  const { club_id, forum_name, forum_description, image } = req.body;
 
-  // Ensure club_id is converted to an integer
   const parsedClubId = parseInt(club_id);
 
   if (!forum_name || !parsedClubId || isNaN(parsedClubId)) {
     return res.status(400).json({ message: 'Valid name and club ID are required' });
   }
 
+  let filename = '';
+  if (image) {
+    filename = await generateCloudinaryImage(image);
+  }
+
   const query = 'INSERT INTO forum_table (club_id, forum_name, forum_description, forum_image) VALUES ($1, $2, $3, $4) RETURNING *';
-  const values = [parsedClubId, forum_name, forum_description, forum_image];
+  const values = [parsedClubId, forum_name, forum_description, filename];
 
   try {
     const { rows } = await pool.query(query, values);
 
-    const fetchQuery = `
-      SELECT forum_table.*, club_table.*, forum_table.created_at AS forum_created , club_table.name AS club_name
-      FROM forum_table 
-      LEFT JOIN club_table ON forum_table.club_id = club_table.id
-      ORDER BY forum_table.created_at DESC`;
-
-    const { rows: forums } = await pool.query(fetchQuery);
-
-    res.status(201).json({ id: rows[0].forum_id, message: 'Forum added successfully', result: forums });
+    res.status(201).json({ message: 'Forum added successfully', result: rows });
   } catch (err) {
     console.error('Error executing PostgreSQL query:', err);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
 
-router.put('/forums/:id', async (req, res) => {
+router.post('/forums/:id', async (req, res) => {
   const { id } = req.params;
-  const { club_id, forum_name, forum_description, forum_image } = req.body;
+  const { club_id, forum_name, forum_description, image } = req.body;
 
   if (!forum_name || !club_id) {
     return res.status(400).json({ message: 'Name and club ID are required' });
   }
 
-  const updateQuery = `
+  let filename = '';
+  if (image) {
+    filename = await generateCloudinaryImage(image);
+  }
+
+  let query;
+  let values;
+  if (filename) {
+    query = `
     UPDATE forum_table 
     SET forum_name = $1, forum_description = $2, club_id = $3, forum_image = $4
     WHERE forum_id = $5`;
-
-  const selectQuery = `
-    SELECT forum_table.*, club_table.*, forum_table.created_at AS forum_created, club_table.name AS club_name
-    FROM forum_table 
-    LEFT JOIN club_table ON forum_table.club_id = club_table.id
-    WHERE forum_table.forum_id = $1
-    ORDER BY forum_table.created_at DESC`;
-
-  const updateValues = [forum_name, forum_description, club_id, forum_image, id];
+    values = [forum_name, forum_description, club_id, filename, id];
+  } else {
+    query = `
+    UPDATE forum_table 
+    SET forum_name = $1, forum_description = $2, club_id = $3
+    WHERE forum_id = $4`;
+    values = [forum_name, forum_description, club_id, id];
+  }
 
   try {
-    await pool.query(updateQuery, updateValues);
-    const { rows } = await pool.query(selectQuery, [id]);
+    const { rows } = await pool.query(query, values);
     res.status(200).json({ message: 'Forum updated successfully', result: rows });
   } catch (err) {
     console.error('Error executing PostgreSQL query:', err);
@@ -275,7 +277,6 @@ router.delete('/forums/:id', async (req, res) => {
   }
 
   const deleteQuery = 'DELETE FROM forum_table WHERE forum_id = $1';
-  const selectQuery = 'SELECT * FROM forum_table WHERE forum_id = $1';
 
   try {
     const deleteResult = await pool.query(deleteQuery, [forumId]);

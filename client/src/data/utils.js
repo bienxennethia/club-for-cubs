@@ -48,48 +48,6 @@ export const getForums = (params = null) => {
     });
 };
 
-export const saveForum = (forumData) => {
-  return fetch(`${apiUrl}/forums`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(forumData)
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Failed to save forums');
-    }
-    return response.json();
-  })
-  .catch(error => {
-    console.error('Error saving forums:', error);
-    throw error;
-  });
-};
-
-export const updateForum = (id, forumData) => {
-  const url = `${apiUrl}/forums/${id}`;
-
-  return fetch(url, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(forumData),
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to update forum');
-      }
-      return response.json();
-    })
-    .catch(error => {
-      console.error('Error updating forum:', error);
-      throw error;
-    });
-};
-
 export const deleteForum = (forumId) => {
   return fetch(`${apiUrl}/forums/${forumId}`, {
     method: 'DELETE'

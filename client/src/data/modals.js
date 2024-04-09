@@ -300,6 +300,8 @@ export const modals = [
   {
     id: "addForum",
     path: "/forums",
+    method: "POST",
+    errorMessage: "Failed to add club. Please try again.",
     class: "modal--forum",
     content: {
       title: "ADD FORUM",
@@ -312,19 +314,22 @@ export const modals = [
           type: "select",
           required: true,
           placeholder: "Select club",
+          label: "Select Club:",
           options: []
         },
         {
           name: "forum_name",
           required: true,
           type: "text",
-          placeholder: "Title"
+          placeholder: "Enter forum title",
+          label: "Title:"
         },
         {
           name: "forum_description",
           required: true,
           type: "textarea",
-          placeholder: "Description"
+          placeholder: "Enter forum description",
+          label: "Description:"
         },
         {
           name: "forum_image",
@@ -338,6 +343,8 @@ export const modals = [
   {
     id: "editForum",
     path: "/forums",
+    method: "POST",
+    errorMessage: "Failed to edit club. Please try again.",
     class: "modal--forum",
     content: {
       title: "EDIT FORUM",
@@ -347,22 +354,25 @@ export const modals = [
       fields: [
         {
           name: "club_id",
-          required: true,
           type: "select",
+          required: true,
           placeholder: "Select club",
+          label: "Select Club:",
           options: []
         },
         {
           name: "forum_name",
           required: true,
           type: "text",
-          placeholder: "Title"
+          placeholder: "Enter forum title",
+          label: "Title:"
         },
         {
           name: "forum_description",
           required: true,
           type: "textarea",
-          placeholder: "Description"
+          placeholder: "Enter forum description",
+          label: "Description:"
         },
         {
           name: "forum_image",
@@ -372,6 +382,13 @@ export const modals = [
         }
       ]
     }
+  },
+  {
+    id: "deleteForum",
+    path: "/forums",
+    method: "DELETE",
+    errorMessage: "Failed to delete club. Please try again.",
+    content: {}
   },
   {
     id: "addForumClub",

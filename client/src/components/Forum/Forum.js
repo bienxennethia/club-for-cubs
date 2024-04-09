@@ -1,12 +1,11 @@
 import { ReactComponent as Logo } from "../../icons/profile.svg";
-import backgroundJpg from "../../images/background.jpg";
-
-
 import AdminBtn from "../AdminBtn/AdminBtn";
 import './Forum.scss';
 import { formatDate } from "../../data/utils";
+import { useCommonState } from "../../data/commonState";
 
 const Forum = ({forum}) => {
+  const { getImage } = useCommonState();
   return (
     <div className="forum__items">
     <div className="forum__item">
@@ -25,11 +24,12 @@ const Forum = ({forum}) => {
       
       { forum.forum_description && 
         <div className="forum__content">
-          <p>{forum.forum_description}</p>
-          <div className="forum__content-image">
-            <img src={backgroundJpg} alt="forum"/>
-          </div>
+        <p>{forum.forum_description}</p>
+        <div className="forum__content-image">
+          <img src={getImage(forum.forum_image)} alt={forum.forum_name}/>
         </div>
+      </div>
+      
       }
       <AdminBtn editModalId="editForum" deleteModalId="deleteForum" id={forum.forum_id}/>
     </div>
