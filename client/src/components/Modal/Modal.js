@@ -120,7 +120,7 @@ const Modal = () => {
                 <div className="modal__actions">
                   {modalContent?.id === "login" && <button className="modal__btn" onClick={registerHandler} disabled={isLoading}>Register</button> 
                   }
-                  <button className="modal__btn" disabled={modalIdOpen === 'profile' || modalIdOpen === 'signup' || isLoading} type="submit">{isLoading ? 'Loading...' : getBtnText()}</button>
+                  <button className="modal__btn" disabled={modalIdOpen === 'profile' || modalIdOpen === 'signup' || modalIdOpen === 'changePassword' || isLoading} type="submit">{isLoading ? 'Loading...' : getBtnText()}</button>
                   <button className="modal__btn clear" onClick={clearFieldsHandler} disabled={isLoading} >Clear</button>
                 </div>
               </form>
