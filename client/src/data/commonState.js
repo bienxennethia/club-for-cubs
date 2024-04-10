@@ -4,11 +4,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Cloudinary } from '@cloudinary/url-gen';
 
 import { modals } from './modals';
-import { getForums, deleteForum, getUsers } from './utils';
+import { getForums, getUsers } from './utils';
 const CommonStateContext = createContext();
 
 export const useCommonState = () => useContext(CommonStateContext);
-const apiUrl = "http://localhost:3001";
+const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 // Common state provider component
 export const CommonStateProvider = ({ children }) => {

@@ -48,22 +48,6 @@ export const getForums = (params = null) => {
     });
 };
 
-export const deleteForum = (forumId) => {
-  return fetch(`${apiUrl}/forums/${forumId}`, {
-    method: 'DELETE'
-  })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to delete club');
-      }
-      return response.json();
-    })
-    .catch(error => {
-      console.error('Error deleting club:', error);
-      throw error;
-    });
-};
-
 export const getUsers = (params = null) => {
   let { user_id = null } = params;
   
