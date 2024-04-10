@@ -43,10 +43,12 @@
   background-size: cover;
   width: t-rem(100);
   height: t-rem(100);
+  min-width: t-rem(100);
 
   @include bp-desktop {
     width: t-rem(150);
     height: t-rem(150);
+    min-width: t-rem(150);
   }
 }
 
