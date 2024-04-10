@@ -11,7 +11,7 @@ import { ReactComponent as ProfileIcon } from "../../icons/profile.svg";
 import {useCommonState} from "../../data/commonState";
 
 const Header = () => {
-  const { isLoggedIn, isVisitor, setModalIdOpen, modalIdOpen, logout, clubLists } = useCommonState();
+  const { isLoggedIn, isVisitor, setModalIdOpen, modalIdOpen, logout, clubLists, toggleModal } = useCommonState();
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isMobile, setMobile] = useState(false);
   const location = useLocation();
@@ -54,6 +54,11 @@ const Header = () => {
   const logoutBtn = () => {
     logout();
     window.location.reload();
+  };
+
+  const modalHandler = (e, id) => {
+    e.stopPropagation();
+    toggleModal(id);
   };
 
   return (
@@ -109,6 +114,14 @@ const Header = () => {
                         <li>
                           <button type="button" onClick={profileBtn} className={`profile--link`}>{isLoggedIn ? "Profile" : "Login"}</button>
                         </li>
+                        {/* { isLoggedIn && <li>
+                            <button type="button" onClick={modalHandler("changePassword")} className={`password--link`}>Change Password</button>
+                          </li>
+                        } */}
+                        { isLoggedIn && <li>
+                            <button type="button" onClick={e => modalHandler(e, "changePassword")} className={`logout--link`}>Change Password</button>
+                          </li>
+                        }
                         { isLoggedIn && <li>
                             <button type="button" onClick={logoutBtn} className={`logout--link`}>Log Out</button>
                           </li>

@@ -29,6 +29,16 @@ async function generateCloudinaryImage(image) {
   }
 }
 
+async function deleteCloudinaryImage(publicId) {
+  try {
+    const result = await cloudinary.uploader.destroy(publicId);
+    return result;
+  } catch (error) {
+    console.error('Error deleting image:', error);
+    throw new Error('Failed to delete image');
+  }
+}
+
 router.get('/club-types', async (req, res) => {
   try {
     const query = 'SELECT * FROM club_type_table';
@@ -274,6 +284,13 @@ router.delete('/forums/:id', async (req, res) => {
 
   if (!forumId) {
     return res.status(400).json({ message: 'Forum ID is required' });
+  }
+  // select the forum to get image
+  const selectQuery = 'SELECT forum_image FROM forum_table WHERE forum_id = $1';
+  const { rows } = await pool.query(selectQuery, [forumId]);
+  const { forum_image } = rows[0];
+  if (forum_image) {
+    await deleteCloudinaryImage(forum_image);
   }
 
   const deleteQuery = 'DELETE FROM forum_table WHERE forum_id = $1';

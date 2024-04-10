@@ -421,4 +421,33 @@ export const modals = [
       ]
     }
   },
+  {
+    id: "changePassword",
+    path: "/user",
+    method: "POST",
+    errorMessage: "Failed to change password. Please try again.",
+    class: "modal--forum",
+    content: {
+      title: "CHANGE PASSWORD",
+      description: "Please fill out the form below to change your password.",
+      subtitle: "",
+      type: "edit-forum",
+      fields: [
+        {
+          name: "password",
+          required: true,
+          type: "password",
+          placeholder: "Enter new password",
+          label: "New Password:"
+        },
+        {
+          name: "confirm_password",
+          required: true,
+          type: "password",
+          placeholder: "Confirm new password",
+          label: "Confirm Password:"
+        }
+      ]
+    }
+  },
 ];
