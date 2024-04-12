@@ -1,11 +1,10 @@
 import { ReactComponent as Logo } from "../../icons/profile.svg";
 import AdminBtn from "../AdminBtn/AdminBtn";
 import './Forum.scss';
-import { formatDate } from "../../data/utils";
 import { useCommonState } from "../../data/commonState";
 
 const Forum = ({forum}) => {
-  const { getImage } = useCommonState();
+  const { getImage, formatDate } = useCommonState();
   return (
     <div className="forum__items">
     <div className="forum__item">

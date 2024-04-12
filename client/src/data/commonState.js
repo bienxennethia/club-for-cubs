@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Cloudinary } from '@cloudinary/url-gen';
 
 import { modals } from './modals';
-import { getForums, getUsers } from './utils';
 const CommonStateContext = createContext();
 
 export const useCommonState = () => useContext(CommonStateContext);
@@ -198,21 +197,61 @@ export const CommonStateProvider = ({ children }) => {
   };
 
   const fetchForums = async (params = null) => {
-    try {
-      const result = await getForums(params);
-      setForumLists(result);
-    } catch (error) {
-      console.error('Error fetching forums:', error);
+    let {id = null, interestType = null, curricularType = null, searchString = null, clubId = null} = params || {};
+    if (interestType === 'all') { interestType = null; }
+    if (curricularType === 'all') { curricularType = null; }
+  
+    let url = `${apiUrl}/forums`;
+    if (id) {
+      url += `?id=${id}`;
+    } else if (interestType && !curricularType) {
+      url += `?club_id_2=${interestType}`;
+    } else if (!interestType && curricularType) {
+      url += `?club_id=${curricularType}`;
+    } else if (interestType && curricularType) {
+      url += `?club_id=${curricularType}&club_id_2=${interestType}`;
+    } else if (clubId) {
+      url += `?club_id=${clubId}`;
     }
+  
+    if (url.includes('?') && searchString) {
+      url += `&search_string=${searchString}`;
+    } else if (!url.includes('?') && searchString) {
+      url += `?search_string=${searchString}`;
+    }
+  
+    return fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch clubs');
+        }
+        return response.json();
+      })
+      .catch(error => {
+        console.error('Error fetching clubs:', error);
+        throw error;
+      });
   };
 
   const fetchUsers = async (params = null) => {
-    try {
-      const result = await getUsers(params);
-      setUsers(result);
-    } catch (error) {
-      console.error('Error fetching users:', error);
+    let { user_id = null } = params;
+    
+    let url = `${apiUrl}/user`;
+    if (user_id) {
+      url += `?user_id=${user_id}`;
     }
+  
+    return fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch user');
+        }
+        return response.json();
+      })
+      .catch(error => {
+        console.error('Error fetching user:', error);
+        throw error;
+      });
   };
 
   const toggleSave = async (formData, imageField = null) => {
@@ -391,6 +430,15 @@ export const CommonStateProvider = ({ children }) => {
     return cld.image(image).toURL();
   }
 
+  const formatDate = (dateTimeString) => {
+    const optionsDate = { month: 'long', day: '2-digit', year: 'numeric' };
+    const optionsTime = { hour: '2-digit', minute: '2-digit', hour12: true };
+    const date = new Date(dateTimeString);
+    const formattedDate = date.toLocaleDateString('en-US', optionsDate);
+    const formattedTime = date.toLocaleTimeString('en-US', optionsTime);
+    return `${formattedDate} | ${formattedTime}`;
+  };
+
   return (
     <CommonStateContext.Provider value={{ 
       currentPage, setCurrentPage, 
@@ -412,7 +460,7 @@ export const CommonStateProvider = ({ children }) => {
       isVisitor, setIsVisitor,
       users, setUsers,
       isLoading, disableField,
-      getImage,
+      getImage, formatDate,
       setWithExpiry, logout,
       toggleModal, closeModal, toggleSave, clearFields, deleteModal, visitorBtn }}>
       {children}
