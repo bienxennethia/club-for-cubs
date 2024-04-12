@@ -8,7 +8,7 @@ const CommonStateContext = createContext();
 
 export const useCommonState = () => useContext(CommonStateContext);
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
-const localApiUrl = "http://localhost:3001";
+// const localApiUrl = "http://localhost:3001";
 
 // Common state provider component
 export const CommonStateProvider = ({ children }) => {
@@ -245,7 +245,7 @@ export const CommonStateProvider = ({ children }) => {
   const fetchUsers = async (params = null) => {
     let { user_id = null } = params;
     
-    let url = `${localApiUrl}/user`;
+    let url = `${apiUrl}/user`;
     if (user_id) {
       url += `?user_id=${user_id}`;
     }
@@ -288,7 +288,7 @@ export const CommonStateProvider = ({ children }) => {
         requestOptions.body = JSON.stringify(formValues);
       }
 
-      let url = `${localApiUrl}${modalContent?.path}`;
+      let url = `${apiUrl}${modalContent?.path}`;
       if (modalIdOpen === 'editClub' || modalIdOpen === 'editForum') {
         url += `/${modalContentId}`;
       }
