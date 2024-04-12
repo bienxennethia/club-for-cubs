@@ -65,7 +65,9 @@ export const modals = [
   },
   {
     id: "signup",
-    path: "/signup",
+    path: "/addUser",
+    method: "POST",
+    errorMessage: "Failed to sign up. Please try again.",
     class: "modal--signup",
     content: {
       title: "SIGN UP",

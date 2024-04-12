@@ -345,6 +345,27 @@ router.post('/login', async (req, res) => {
 });
 
 
+router.post('/addUser', async (req, res) => {
+  const { first_name, last_name, middle_name, email, password, year, section, club_id } = req.body;
+
+  try {
+    const insertQuery = ` INSERT INTO user_table
+    (first_name, last_name, middle_name, email, password, year, section, access)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, 'toVerifyAccount') RETURNING *`;
+    const values = [first_name, last_name, middle_name, email, password, year, section];
+    const { rows } = await pool.query(insertQuery, values);
+
+    const insertQuery2 = `INSERT INTO clublist (user_id, club_id) VALUES ($1, $2) RETURNING *`;
+    const values2 = [rows[0].user_id, club_id];
+    await pool.query(insertQuery2, values2);
+    res.status(200).json({ message: 'User added successfully. Please wait for the admin to approve your account.', result: rows });
+  } catch (err) {
+    console.error('Error executing PostgreSQL query:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
 router.get('/user', async (req, res) => {
   const { user_id } = req.query;
   

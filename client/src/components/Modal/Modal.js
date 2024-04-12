@@ -7,7 +7,7 @@ import SelectField from "./SelectField";
 import ImageUpload from "./ImageUpload";
 import { useCommonState } from "../../data/commonState";
 const Modal = () => {
-  const { modalIdOpen, modalContent, closeModal, response, toggleSave, clearFields, isDeleteModal, deleteModal, toggleModal, isLoading } = useCommonState();
+  const { modalIdOpen, modalContent, closeModal, response, toggleSave, clearFields, isDeleteModal, deleteModal, toggleModal, isLoading, disableField } = useCommonState();
 
   const [image, setImage] = useState(null);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -39,6 +39,11 @@ const Modal = () => {
     if (selectedFile && allowedTypes.includes(selectedFile.type)) {
       previewFiles(selectedFile);
     }
+
+    const input = document.querySelector(`.fields-modal__input[type="file"]`);
+    if (input) {
+      input.setCustomValidity('');
+    }
   };
 
   const clearFieldsHandler = () => {
@@ -67,7 +72,35 @@ const Modal = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    toggleSave(event, image);
+    const formData = new FormData(event.target);
+
+    if (modalContent?.id === "signup" || modalContent?.id === "changePassword") {
+      const passwordField = event.target.querySelector('[name="password"]');
+      passwordField.setCustomValidity('');
+      const confirmPasswordField = event.target.querySelector('[name="confirm_password"]');
+      confirmPasswordField.setCustomValidity('');
+
+      const password = formData.get("password");
+      const hasNumber = /\d/.test(password);
+      const hasLetter = /[a-zA-Z]/.test(password);
+      const hasSymbol = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
+      if (!hasNumber || !hasLetter || !hasSymbol) {
+        passwordField.setCustomValidity('Password must contain at least one number, one letter, and one symbol');
+        passwordField.reportValidity();
+        return;
+      } else {
+        passwordField.setCustomValidity('');
+      }
+
+      if (formData.get("password") !== formData.get("confirm_password")) {
+        confirmPasswordField.setCustomValidity('Passwords do not match');
+        confirmPasswordField.reportValidity();
+        return;
+      } else {
+        confirmPasswordField.setCustomValidity('');
+      }
+    }
+    toggleSave(formData, image);
   };
 
   return (
@@ -120,8 +153,9 @@ const Modal = () => {
                 <div className="modal__actions">
                   {modalContent?.id === "login" && <button className="modal__btn" onClick={registerHandler} disabled={isLoading}>Register</button> 
                   }
-                  <button className="modal__btn" disabled={modalIdOpen === 'profile' || modalIdOpen === 'signup' || modalIdOpen === 'changePassword' || isLoading} type="submit">{isLoading ? 'Loading...' : getBtnText()}</button>
-                  <button className="modal__btn clear" onClick={clearFieldsHandler} disabled={isLoading} >Clear</button>
+                  <button className="modal__btn" disabled={modalIdOpen === 'profile' || modalIdOpen === 'changePassword' || isLoading || disableField} type="submit">{isLoading ? 'Loading...' : getBtnText()}</button>
+                  { !disableField && <button className="modal__btn clear" onClick={clearFieldsHandler} disabled={isLoading} >Clear</button> }
+                  { disableField && <button className="modal__btn clear" onClick={closeModal} disabled={isLoading} >Close</button> }
                 </div>
               </form>
             </div>

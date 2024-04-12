@@ -9,6 +9,7 @@ const CommonStateContext = createContext();
 
 export const useCommonState = () => useContext(CommonStateContext);
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
+const localApiUrl = "http://localhost:3001";
 
 // Common state provider component
 export const CommonStateProvider = ({ children }) => {
@@ -33,6 +34,7 @@ export const CommonStateProvider = ({ children }) => {
   const [isVisitor, setIsVisitor] = useState(false);
   const [users, setUsers] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [disableField, setDisableField] = useState(false);
 
   useEffect(() => {
     const itemID = location.pathname.includes('item') ? location.pathname.split('/').pop() : null;
@@ -213,14 +215,10 @@ export const CommonStateProvider = ({ children }) => {
     }
   };
 
-  const toggleSave = async (event, imageField = null) => {
+  const toggleSave = async (formData, imageField = null) => {
     setIsLoading(true);
     let isSuccess = false;
     try {
-      event.preventDefault();
-  
-      const formData = new FormData(event.target);
-
       if (imageField) {
         formData.append('image', imageField);
       }
@@ -238,7 +236,7 @@ export const CommonStateProvider = ({ children }) => {
         requestOptions.body = JSON.stringify(formValues);
       }
 
-      let url = `${apiUrl}${modalContent?.path}`;
+      let url = `${localApiUrl}${modalContent?.path}`;
       if (modalIdOpen === 'editClub' || modalIdOpen === 'editForum') {
         url += `/${modalContentId}`;
       }
@@ -263,6 +261,8 @@ export const CommonStateProvider = ({ children }) => {
         } else if (modalIdOpen === 'addForum' || modalIdOpen === 'editForum') {
           fetchForums({id: null, interestType, curricularType, searchString});
           isSuccess = true;
+        } else if (modalIdOpen === 'addUser') {
+          setDisableField(true);
         }
         setResponse({id: currentPage, message: data?.message});
       })
@@ -411,7 +411,7 @@ export const CommonStateProvider = ({ children }) => {
       isLoggedIn, setIsLoggedIn,
       isVisitor, setIsVisitor,
       users, setUsers,
-      isLoading,
+      isLoading, disableField,
       getImage,
       setWithExpiry, logout,
       toggleModal, closeModal, toggleSave, clearFields, deleteModal, visitorBtn }}>
