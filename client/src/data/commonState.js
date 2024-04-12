@@ -133,6 +133,10 @@ export const CommonStateProvider = ({ children }) => {
             } else if (modalIdOpen === 'addClub' || modalIdOpen === 'editClub') {
               newFields = { ...newFields, options: clubTypeOptions };
             }
+
+            if (users?.access === 'admin') {
+              newFields = { ...newFields, required: false };
+            }
           }
   
           if (modalIdOpen === 'editForum' || modalIdOpen === 'editClub') {
@@ -142,8 +146,13 @@ export const CommonStateProvider = ({ children }) => {
           }
 
           if (modalIdOpen === 'profile') {
-            users[0][newFields.name] = users[0][newFields.name] || null;
-            newFields = { ...newFields, value: users[0][newFields.name] };
+            users[newFields.name] = users[newFields.name] || null;
+            newFields = { ...newFields, value: users[newFields.name] };
+          }
+
+          if (modalIdOpen === 'changePassword') {
+            users[newFields.name] = users[newFields.name] || null;
+            newFields = { ...newFields, value: users[newFields.name] };
           }
           return newFields;
         }));
@@ -236,7 +245,7 @@ export const CommonStateProvider = ({ children }) => {
   const fetchUsers = async (params = null) => {
     let { user_id = null } = params;
     
-    let url = `${apiUrl}/user`;
+    let url = `${localApiUrl}/user`;
     if (user_id) {
       url += `?user_id=${user_id}`;
     }
@@ -248,6 +257,9 @@ export const CommonStateProvider = ({ children }) => {
         }
         return response.json();
       })
+      .then(data => {
+        setUsers(data[0]);
+      })
       .catch(error => {
         console.error('Error fetching user:', error);
         throw error;
@@ -256,6 +268,7 @@ export const CommonStateProvider = ({ children }) => {
 
   const toggleSave = async (formData, imageField = null) => {
     setIsLoading(true);
+    setResponse({id: currentPage, message: ''});
     let isSuccess = false;
     try {
       if (imageField) {
@@ -302,7 +315,10 @@ export const CommonStateProvider = ({ children }) => {
           isSuccess = true;
         } else if (modalIdOpen === 'addUser') {
           setDisableField(true);
+        } else if (modalIdOpen === 'profile') {
+          setUsers(data?.user);
         }
+
         setResponse({id: currentPage, message: data?.message});
       })
       .catch(error => {

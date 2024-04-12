@@ -62,6 +62,7 @@ const Modal = () => {
       case "editClub":
       case "editForum":
       case "profile":
+      case "changePassword":
         return "Update";
       case "login":
         return "Login";
@@ -84,6 +85,13 @@ const Modal = () => {
       const hasNumber = /\d/.test(password);
       const hasLetter = /[a-zA-Z]/.test(password);
       const hasSymbol = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
+      
+      if (password.length < 8) {
+        passwordField.setCustomValidity('Password must be at least 8 characters long');
+        passwordField.reportValidity();
+        return;
+      }
+
       if (!hasNumber || !hasLetter || !hasSymbol) {
         passwordField.setCustomValidity('Password must contain at least one number, one letter, and one symbol');
         passwordField.reportValidity();
@@ -145,6 +153,7 @@ const Modal = () => {
                     {field.type === "file" && <ImageUpload field={field} handleImageChange={handleImageChange} />}
                     {field.type === "select" && <SelectField field={field} /> }
                     {(field.type === "text" || field.type === "textarea" || field.type === "password" || field.type === "email") && <InputField field={field} /> }
+                    {field.type === "hidden" && <input type="hidden" name={field.name} value={field.value} /> }
                   </div>
                 ))}
                 <div className="modal__footer">
@@ -153,7 +162,7 @@ const Modal = () => {
                 <div className="modal__actions">
                   {modalContent?.id === "login" && <button className="modal__btn" onClick={registerHandler} disabled={isLoading}>Register</button> 
                   }
-                  <button className="modal__btn" disabled={modalIdOpen === 'profile' || modalIdOpen === 'changePassword' || isLoading || disableField} type="submit">{isLoading ? 'Loading...' : getBtnText()}</button>
+                  <button className="modal__btn" disabled={isLoading || disableField} type="submit">{isLoading ? 'Loading...' : getBtnText()}</button>
                   { !disableField && <button className="modal__btn clear" onClick={clearFieldsHandler} disabled={isLoading} >Clear</button> }
                   { disableField && <button className="modal__btn clear" onClick={closeModal} disabled={isLoading} >Close</button> }
                 </div>

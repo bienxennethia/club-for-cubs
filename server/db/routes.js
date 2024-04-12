@@ -316,7 +316,7 @@ router.post('/login', async (req, res) => {
 
   try {
     const userQuery = `
-    SELECT u.user_id, u.first_name, u.last_name, u.middle_name, u.year, u.section, u.email, c.*
+    SELECT u.user_id, u.first_name, u.last_name, u.middle_name, u.year, u.section, u.email, u.access, c.club_id
     FROM user_table u
     LEFT JOIN clublist c ON u.user_id = c.user_id
     WHERE u.email = $1 AND u.password = $2 AND 
@@ -329,6 +329,10 @@ router.post('/login', async (req, res) => {
 
     if (!user) {
       return res.status(400).json({ message: 'Please verify the information provided and try again.' });
+    }
+
+    if (user.access === 'toVerifyAccount') {
+      res.status(200).json({ message: 'Please wait for the admin to approve your account.' });
     }
 
     // Generate JWT token
@@ -349,6 +353,12 @@ router.post('/addUser', async (req, res) => {
   const { first_name, last_name, middle_name, email, password, year, section, club_id } = req.body;
 
   try {
+    const emailQuery = 'SELECT * FROM user_table WHERE email = $1';
+    const { rows: emailRows } = await pool.query(emailQuery, [email]);
+    if (emailRows.length > 0) {
+      return res.status(400).json({ message: 'User already exists. Please login.' });
+    }
+
     const insertQuery = ` INSERT INTO user_table
     (first_name, last_name, middle_name, email, password, year, section, access)
     VALUES ($1, $2, $3, $4, $5, $6, $7, 'toVerifyAccount') RETURNING *`;
@@ -359,6 +369,48 @@ router.post('/addUser', async (req, res) => {
     const values2 = [rows[0].user_id, club_id];
     await pool.query(insertQuery2, values2);
     res.status(200).json({ message: 'User added successfully. Please wait for the admin to approve your account.', result: rows });
+  } catch (err) {
+    console.error('Error executing PostgreSQL query:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.post('/updateUser', async (req, res) => {
+  const { user_id, first_name, last_name, middle_name, email, year, section, club_id, access } = req.body;
+
+  try {
+    const emailQuery = 'SELECT * FROM user_table WHERE email = $1 AND user_id <> $2';
+    const { rows: emailRows } = await pool.query(emailQuery, [email, user_id]);
+    if (emailRows.length > 0) {
+      return res.status(400).json({ message: 'Email already exists. Use a different email' });
+    }
+
+    const updateQuery = `UPDATE user_table SET first_name = $1, last_name = $2, middle_name = $3, email = $4, year = $5, section = $6 WHERE user_id = $7 RETURNING *`;
+    const values = [first_name, last_name, middle_name, email, year, section, user_id];
+    await pool.query(updateQuery, values);
+
+    if (club_id) {
+      const clubListQuery = 'SELECT * FROM clublist WHERE user_id = $1';
+      const { rows: clubListRows } = await pool.query(clubListQuery, [user_id]);
+      if (clubListRows.length > 0) {
+        const updateClubListQuery = `UPDATE clublist SET club_id = $1 WHERE user_id = $2 RETURNING *`;
+        const values2 = [club_id, user_id];
+        await pool.query(updateClubListQuery, values2);
+      } else {
+        const insertClubListQuery = `INSERT INTO clublist (user_id, club_id) VALUES ($1, $2) RETURNING *`;
+        const values3 = [user_id, club_id];
+        await pool.query(insertClubListQuery, values3);
+      }
+    }
+
+    const userQuery = `
+      SELECT u.user_id, u.first_name, u.last_name, u.middle_name, u.year, u.section, u.email, u.access, c.club_id
+      FROM user_table u
+      LEFT JOIN clublist c ON u.user_id = c.user_id
+      WHERE u.user_id = $1`;
+    const { rows: updatedUserWithClubRows } = await pool.query(userQuery, [user_id]);
+
+    res.status(200).json({ message: 'User updated successfully.', user: updatedUserWithClubRows[0] });
   } catch (err) {
     console.error('Error executing PostgreSQL query:', err);
     res.status(500).json({ message: 'Internal server error' });
@@ -378,6 +430,7 @@ router.get('/user', async (req, res) => {
       u.email, 
       u.year, 
       u.section,
+      u.access,
       c.club_id
     FROM 
       user_table u
@@ -396,6 +449,20 @@ router.get('/user', async (req, res) => {
   try {
     const { rows } = await pool.query(query, values);
     res.json(rows);
+  } catch (err) {
+    console.error('Error executing PostgreSQL query:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.post('/changePassword', async (req, res) => {
+  const { user_id, password } = req.body;
+  
+  try {
+    const updateQuery = `UPDATE user_table SET password = $1 WHERE user_id = $2 RETURNING *`;
+    const values = [password, user_id];
+    await pool.query(updateQuery, values);
+    res.status(200).json({ message: 'Password changed successfully.' });
   } catch (err) {
     console.error('Error executing PostgreSQL query:', err);
     res.status(500).json({ message: 'Internal server error' });

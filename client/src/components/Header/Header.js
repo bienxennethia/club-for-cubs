@@ -11,7 +11,7 @@ import { ReactComponent as ProfileIcon } from "../../icons/profile.svg";
 import {useCommonState} from "../../data/commonState";
 
 const Header = () => {
-  const { isLoggedIn, isVisitor, setModalIdOpen, modalIdOpen, logout, clubLists, toggleModal } = useCommonState();
+  const { isLoggedIn, isVisitor, setModalIdOpen, modalIdOpen, logout, clubLists } = useCommonState();
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isMobile, setMobile] = useState(false);
   const location = useLocation();
@@ -43,22 +43,23 @@ const Header = () => {
     return isMobile ? setMenuOpen(false) : null;
   };
 
-  const profileBtn = () => {
-    if (isLoggedIn) {
-      setModalIdOpen("profile");
-    } else {
-      setModalIdOpen("login");
-    }
-  };
-
   const logoutBtn = () => {
     logout();
     window.location.reload();
   };
 
-  const modalHandler = (e, id) => {
+  const modalHandler = (e, id = null) => {
     e.stopPropagation();
-    toggleModal(id);
+
+    if (id) {
+      setModalIdOpen(id);
+    } else {
+      if (isLoggedIn) {
+        setModalIdOpen("profile");
+      } else {
+        setModalIdOpen("login");
+      }
+    }
   };
 
   return (
@@ -112,12 +113,8 @@ const Header = () => {
                     <div className="mini-dialog" onMouseEnter={() => setProfileHovered(true)} onMouseLeave={() => setProfileHovered(false)} >
                       <ul>
                         <li>
-                          <button type="button" onClick={profileBtn} className={`profile--link`}>{isLoggedIn ? "Profile" : "Login"}</button>
+                          <button type="button" onClick={e => modalHandler(e)} className={`profile--link`}>{isLoggedIn ? "Profile" : "Login"}</button>
                         </li>
-                        {/* { isLoggedIn && <li>
-                            <button type="button" onClick={modalHandler("changePassword")} className={`password--link`}>Change Password</button>
-                          </li>
-                        } */}
                         { isLoggedIn && <li>
                             <button type="button" onClick={e => modalHandler(e, "changePassword")} className={`logout--link`}>Change Password</button>
                           </li>
@@ -132,12 +129,20 @@ const Header = () => {
               </li>
               }
               <li className='navigation__item mobile'>
-                <NavLink to="#" onClick={profileBtn} className={`profile--link`}>
+                <NavLink to="#" onClick={e => modalHandler(e)} className={`profile--link`}>
                   <div className="navigation__link">
                     <span className='navigation__link--text'>{isLoggedIn ? "PROFILE" : "LOGIN"}</span>
                   </div>
                 </NavLink>
               </li>
+              { isLoggedIn && <li className='navigation__item mobile'>
+                  <NavLink to="#" onClick={e => modalHandler(e, "changePassword")} className={`profile--link`}>
+                    <div className="navigation__link">
+                      <span className='navigation__link--text'>CHANGE PASSWORD</span>
+                    </div>
+                  </NavLink>
+                </li>
+                }
               { isLoggedIn && (
                   <li className='navigation__item mobile'>
                     <NavLink to="#" onClick={logoutBtn} className={`logout--link`}>

@@ -1,11 +1,21 @@
 export const modals = [
   {
     id: "profile",
-    path: "/signup",
+    path: "/updateUser",
+    method: "POST",
+    errorMessage: "Failed to update profile. Please try again.",
     class: "modal--signup",
     content: {
       title: "PROFILE",
       fields: [
+        {
+          type: "hidden",
+          name: "user_id"
+        },
+        {
+          type: "hidden",
+          name: "access"
+        },
         {
           label: "Club Name:",
           name: "club_id",
@@ -425,7 +435,7 @@ export const modals = [
   },
   {
     id: "changePassword",
-    path: "/user",
+    path: "/changePassword",
     method: "POST",
     errorMessage: "Failed to change password. Please try again.",
     class: "modal--forum",
@@ -435,6 +445,10 @@ export const modals = [
       subtitle: "",
       type: "edit-forum",
       fields: [
+        {
+          type: "hidden",
+          name: "user_id",
+        },
         {
           name: "password",
           required: true,
