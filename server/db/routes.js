@@ -207,7 +207,7 @@ router.get('/forums', async (req, res) => {
   
     try {
     const { rows } = await pool.query(query, parameters);
-    res.json(rows);
+    res.status(200).json({ result: rows });
   } catch (err) {
     console.error('Error executing PostgreSQL query:', err);
     res.status(500).json({ message: 'Internal server error' });
@@ -320,8 +320,8 @@ router.post('/login', async (req, res) => {
     FROM user_table u
     LEFT JOIN clublist c ON u.user_id = c.user_id
     WHERE u.email = $1 AND u.password = $2 AND 
-        (u.access = 'admin' OR 
-         (u.access <> 'admin' AND c.club_id = $3))`;
+        (u.access = 'dev' OR 
+         (u.access <> 'dev' AND c.club_id = $3))`;
 
       
     const userResult = await pool.query(userQuery, [email, password, club_id]);
@@ -333,6 +333,8 @@ router.post('/login', async (req, res) => {
 
     if (user.access === 'toVerifyAccount') {
       res.status(200).json({ message: 'Please wait for the admin to approve your account.' });
+    } else if (user.access === 'disabled') {
+      res.status(200).json({ message: 'Your account has been disabled.' });
     }
 
     // Generate JWT token
@@ -468,6 +470,55 @@ router.post('/changePassword', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+router.get('/accounts', async (req, res) => {
+  const { user_id } = req.query;
+  
+    let query = `
+    SELECT 
+      u.user_id, 
+      u.first_name, 
+      u.last_name, 
+      u.middle_name, 
+      u.email, 
+      u.year, 
+      u.section,
+      u.access,
+      c.club_id,
+      cb.name AS club_name
+    FROM 
+      user_table u
+    LEFT JOIN 
+      clublist c ON u.user_id = c.user_id
+    LEFT JOIN
+      club_table cb ON c.club_id = cb.id
+    WHERE 
+      u.user_id != $1 AND u.access != 'dev'`;
+  
+  query += ' ORDER BY LOWER(u.last_name) ASC';
+  
+  try {
+    const { rows } = await pool.query(query, [user_id]);
+    res.json({message: "Fetch accounts success", accounts: rows});
+  } catch (err) {
+    console.error('Error executing PostgreSQL query:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.post('/accounts', async (req, res) => {
+  const { user_id, status } = req.body;
+  
+  try {
+    const updateQuery = `UPDATE user_table SET access = $1 WHERE user_id = $2 RETURNING *`;
+    const values = [status, user_id];
+    await pool.query(updateQuery, values);
+    res.status(200).json({ message: 'Account status updated successfully.' });
+  } catch (err) {
+    console.error('Error executing PostgreSQL query:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+})
 
 router.post('/upload', async (req, res) => {
   const {image} = req.body;
