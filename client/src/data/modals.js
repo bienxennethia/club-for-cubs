@@ -347,7 +347,8 @@ export const modals = [
           name: "forum_image",
           type: "file",
           placeholder: "Forum Image",
-          label: "Forum Image:"
+          label: "Forum Image:",
+          required: true
         }
       ]
     }
@@ -405,6 +406,8 @@ export const modals = [
   {
     id: "addForumClub",
     path: "/forums",
+    method: "POST",
+    errorMessage: "Failed to add club. Please try again.",
     class: "modal--forum",
     content: {
       title: "ADD FORUM",
@@ -416,19 +419,22 @@ export const modals = [
           name: "forum_name",
           required: true,
           type: "text",
-          placeholder: "Title"
+          placeholder: "Enter forum title",
+          label: "Title:"
         },
         {
           name: "forum_description",
           required: true,
           type: "textarea",
-          placeholder: "Description"
+          placeholder: "Enter forum description",
+          label: "Description:"
         },
         {
           name: "forum_image",
           type: "file",
           placeholder: "Forum Image",
-          label: "Forum Image:"
+          label: "Forum Image:",
+          required: true
         }
       ]
     }

@@ -10,7 +10,8 @@ import { useCommonState } from "../../data/commonState";
 
 const AdminBtn = ({ editModalId, deleteModalId, id = null }) => {
   const { setModalContentId, toggleModal, isLoggedIn } = useCommonState();
-  const itemId = useParams()?.id || id;
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const itemId = id || useParams()?.id;
   const btnHandler = (modalId) => {
     setModalContentId(itemId);
     toggleModal(modalId);

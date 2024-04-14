@@ -7,13 +7,20 @@ import SelectField from "./SelectField";
 import ImageUpload from "./ImageUpload";
 import { useCommonState } from "../../data/commonState";
 const Modal = () => {
-  const { modalIdOpen, modalContent, closeModal, response, toggleSave, clearFields, isDeleteModal, deleteModal, toggleModal, isLoading, disableField } = useCommonState();
+  const { modalIdOpen, modalContent, closeModal, response, toggleSave, clearFields, isDeleteModal, deleteModal, toggleModal, isLoading, disableField, isLoggedIn } = useCommonState();
 
   const [image, setImage] = useState(null);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleKeyDown = (event) => {
     if (event.key === 'Escape') {
       closeModal();
+    }
+
+    if (event.key === 'Enter') {
+      const submitBtn = document.querySelector(`.modal__btn--submit`);
+      if (submitBtn) {
+        submitBtn.click();
+      }
     }
   };
 
@@ -23,7 +30,7 @@ const Modal = () => {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleKeyDown, closeModal]);
+  }, [handleKeyDown]);
 
   const previewFiles = (file) => {
     const reader = new FileReader();
@@ -75,7 +82,7 @@ const Modal = () => {
     event.preventDefault();
     const formData = new FormData(event.target);
 
-    if (modalContent?.id === "signup" || modalContent?.id === "changePassword") {
+    if ((modalContent?.id === "signup" && !isLoggedIn) || modalContent?.id === "changePassword") {
       const passwordField = event.target.querySelector('[name="password"]');
       passwordField.setCustomValidity('');
       const confirmPasswordField = event.target.querySelector('[name="confirm_password"]');
@@ -160,11 +167,11 @@ const Modal = () => {
                   <p className="modal__response">{response?.message}</p>
                 </div>
                 <div className="modal__actions">
-                  {modalContent?.id === "login" && <button className="modal__btn" onClick={registerHandler} disabled={isLoading}>Register</button> 
+                  {modalContent?.id === "login" && <button className="modal__btn btn" onClick={registerHandler} disabled={isLoading}>Register</button> 
                   }
-                  <button className="modal__btn" disabled={isLoading || disableField} type="submit">{isLoading ? 'Loading...' : getBtnText()}</button>
-                  { !disableField && <button className="modal__btn clear" onClick={clearFieldsHandler} disabled={isLoading} >Clear</button> }
-                  { disableField && <button className="modal__btn clear" onClick={closeModal} disabled={isLoading} >Close</button> }
+                  <button className="modal__btn btn modal__btn--submit" disabled={isLoading || disableField} type="submit">{isLoading ? 'Loading...' : getBtnText()}</button>
+                  { !disableField && <button className="modal__btn btn clear" onClick={clearFieldsHandler} disabled={isLoading} >Clear</button> }
+                  { disableField && <button className="modal__btn btn clear" onClick={closeModal} disabled={isLoading} >Close</button> }
                 </div>
               </form>
             </div>
@@ -175,8 +182,8 @@ const Modal = () => {
               <p>Are you sure you want to delete?</p>
               
               <div className="modal__actions">
-                    <button className="modal__btn" onClick={deleteModal} disabled={isLoading}>{isLoading ? 'Loading...' : 'Yes'}</button>
-                    <button className="modal__btn clear" onClick={closeModal} disabled={isLoading}>No</button>
+                    <button className="modal__btn btn" onClick={deleteModal} disabled={isLoading}>{isLoading ? 'Loading...' : 'Yes'}</button>
+                    <button className="modal__btn btn clear" onClick={closeModal} disabled={isLoading}>No</button>
                   </div>
             </div>
           }

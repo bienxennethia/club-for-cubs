@@ -11,7 +11,7 @@ import { ReactComponent as ProfileIcon } from "../../icons/profile.svg";
 import {useCommonState} from "../../data/commonState";
 
 const Header = () => {
-  const { isLoggedIn, isVisitor, setModalIdOpen, modalIdOpen, logout, clubLists } = useCommonState();
+  const { isLoggedIn, isVisitor, setModalIdOpen, modalIdOpen, logout, clubLists, isAdmin, navigate } = useCommonState();
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isMobile, setMobile] = useState(false);
   const location = useLocation();
@@ -60,7 +60,14 @@ const Header = () => {
         setModalIdOpen("login");
       }
     }
+    closeMenu();
   };
+
+  const accountHandler = () => {
+    navigate('/accounts');
+
+    closeMenu();
+  }
 
   return (
     <div className="header">
@@ -112,6 +119,10 @@ const Header = () => {
                 { isProfileHovered && (
                     <div className="mini-dialog" onMouseEnter={() => setProfileHovered(true)} onMouseLeave={() => setProfileHovered(false)} >
                       <ul>
+                        { isLoggedIn && isAdmin && <li>
+                          <button to="/accounts" onClick={accountHandler}>Accounts</button>
+                          </li>
+                        }
                         <li>
                           <button type="button" onClick={e => modalHandler(e)} className={`profile--link`}>{isLoggedIn ? "Profile" : "Login"}</button>
                         </li>
@@ -128,6 +139,19 @@ const Header = () => {
                   )}
               </li>
               }
+              { isLoggedIn && isAdmin && <li className='navigation__item mobile'>
+                  <NavLink className={({ isActive }) =>
+                    [
+                      isActive ? "active" : "",
+                      "profile--link",
+                      "accounts--link"
+                    ].join(" ")} to="/accounts" onClick={closeMenu} title="Accounts">
+                    <div className="navigation__link">
+                      <span className='navigation__link--text'>ACCOUNTS</span>
+                    </div>
+                  </NavLink>
+                </li>
+                }
               <li className='navigation__item mobile'>
                 <NavLink to="#" onClick={e => modalHandler(e)} className={`profile--link`}>
                   <div className="navigation__link">

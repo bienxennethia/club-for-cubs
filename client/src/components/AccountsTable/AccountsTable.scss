@@ -1,0 +1,139 @@
+@import 'src/styles/index.scss';
+
+.table__container {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  padding: 20px;
+}
+
+table th {
+  border-bottom: 2px solid $maroon;
+  background: $maroon;
+  padding: 20px 30px;
+  text-wrap: nowrap;
+  text-align: center;
+}
+
+table td {
+  padding: 20px 30px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+table tbody {
+  background-color: $deep-red;
+}
+
+table thead,
+table tbody td {
+  border: 1px solid $maroon
+}
+
+.accounts__title {
+  font-size: t-rem(70);
+  margin: 0;
+  margin-bottom: 20px;
+  font-weight: 900;
+
+  @include bp-desktop {
+    font-size: t-rem(100);
+  }
+}
+
+.table__pagination {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.table__pagination-button {
+  background-color: $maroon;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $deep-red;
+
+    &:disabled {
+      background-color: $maroon;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.toggle-container {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.toggle-switch {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: $maroon;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px $maroon;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.toggle-switch input:disabled + .slider {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+.toggle-switch input:disabled + .slider:before {
+  background-color: #aaa;
+}

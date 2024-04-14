@@ -217,26 +217,3 @@
     justify-content: center;
   }
 }
-
-.modal__btn {
-  padding: t-rem(10);
-  width: 100%;
-  max-width: t-rem(150);
-  border: t-rem(1) solid $maroon;
-  border-radius: t-rem(20);
-  background-color: $deep-red;
-  color: $maroon;
-  font-size: t-rem(16);
-  font-weight: bold;
-  color: $white;
-  cursor: pointer;
-
-  &:hover {
-    background-color: $dark-red;
-  }
-
-  &[disabled] {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}

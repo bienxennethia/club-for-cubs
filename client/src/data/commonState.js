@@ -7,8 +7,8 @@ import { modals } from './modals';
 const CommonStateContext = createContext();
 
 export const useCommonState = () => useContext(CommonStateContext);
-const apiUrl = process.env.REACT_APP_API_BASE_URL;
-// const localApiUrl = "http://localhost:3001";
+const isLocalhost = window.location.hostname === 'localhost';
+const apiUrl = isLocalhost ? "http://localhost:3001" : process.env.REACT_APP_API_BASE_URL;
 
 // Common state provider component
 export const CommonStateProvider = ({ children }) => {
@@ -34,17 +34,26 @@ export const CommonStateProvider = ({ children }) => {
   const [users, setUsers] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [disableField, setDisableField] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [accounts, setAccounts] = useState([]);
+  const [isPageLoading, setIsPageLoading] = useState(false);
 
   useEffect(() => {
+    setIsPageLoading(true);
     const itemID = location.pathname.includes('item') ? location.pathname.split('/').pop() : null;
     
     fetchClubs({ id: itemID, type: selectedClubType });
+
+    if (location.pathname.includes('item') && itemID) {
+      fetchForums({id: null, interestType: null, curricularType: itemID, searchString: null});
+    }
   }, [location.pathname, selectedClubType]);
 
   useEffect(() => {
     const verifyLoggedIn = getWithExpiry('isLoggedIn');
     if (verifyLoggedIn !== null) {
       fetchUsers({user_id: verifyLoggedIn?.user?.user_id});
+      fetchAccounts({user_id: verifyLoggedIn?.user?.user_id});
       setIsLoggedIn(verifyLoggedIn?.value === true);
     } else {
       const verifyVisitor = getWithExpiry('isVisitor');
@@ -81,6 +90,7 @@ export const CommonStateProvider = ({ children }) => {
     setSelectedClubType(null);
 
     if (location.pathname.includes('forums')) {
+      setIsPageLoading(true);
       document.querySelector('.content').classList.add('forums');
       setCurricularType('all');
       setInterestType('all');
@@ -89,6 +99,11 @@ export const CommonStateProvider = ({ children }) => {
       fetchForums();
     } else {
       document.querySelector('.content').classList.remove('forums');
+    }
+
+    if (location.pathname.includes('accounts') && users) {
+      setIsPageLoading(true);
+      fetchAccounts({user_id: users?.user_id});
     }
     window.scrollTo(0, 0);
   }, [location.pathname]);
@@ -104,7 +119,8 @@ export const CommonStateProvider = ({ children }) => {
   }, [clubLists]);
 
   useEffect(() => {
-    if (location.pathname.includes('forums')) {
+    if (location.pathname.includes('forums')) {  
+    setIsPageLoading(true);
       fetchForums({id: null, interestType, curricularType, searchString});
     }
   }, [interestType, curricularType, searchString, location.pathname]);
@@ -120,6 +136,7 @@ export const CommonStateProvider = ({ children }) => {
 
     const getModal = async () => {
       addStyling(true);
+      setDisableField(false);
       const modal = modals.find((modal) => modal.id === modalIdOpen);
       if (modalIdOpen === 'deleteForum' || modalIdOpen === 'deleteClub') {
         setIsDeleteModal(true);
@@ -134,7 +151,7 @@ export const CommonStateProvider = ({ children }) => {
               newFields = { ...newFields, options: clubTypeOptions };
             }
 
-            if (users?.access === 'admin') {
+            if (users?.access === 'dev') {
               newFields = { ...newFields, required: false };
             }
           }
@@ -154,8 +171,17 @@ export const CommonStateProvider = ({ children }) => {
             users[newFields.name] = users[newFields.name] || null;
             newFields = { ...newFields, value: users[newFields.name] };
           }
+
+          if (modalIdOpen === 'signup' && isLoggedIn &&(newFields.name === 'password' || newFields.name === 'confirm_password')) {
+            return null;
+          }
+
           return newFields;
-        }));
+        }).filter(field => field !== null));
+        
+        if (modalIdOpen === 'signup' && isLoggedIn) {
+          updatedFields.push({ name: 'password', value: 'password@1234', type: 'hidden' });
+        }
         setModalContent({ ...modal, content: { ...modal.content, fields: updatedFields }});
       }
     };
@@ -202,7 +228,7 @@ export const CommonStateProvider = ({ children }) => {
     .catch(error => {
       console.error('Error fetching clubs:', error);
       throw error;
-    });
+    }).finally(() => setIsPageLoading(false));
   };
 
   const fetchForums = async (params = null) => {
@@ -236,14 +262,21 @@ export const CommonStateProvider = ({ children }) => {
         }
         return response.json();
       })
+      .then(data => {
+        setForumLists(data?.result);
+      })
       .catch(error => {
         console.error('Error fetching clubs:', error);
         throw error;
-      });
+      }).finally(() => setIsPageLoading(false));
   };
 
   const fetchUsers = async (params = null) => {
     let { user_id = null } = params;
+
+    if (!user_id) {
+      return;
+    }
     
     let url = `${apiUrl}/user`;
     if (user_id) {
@@ -259,6 +292,7 @@ export const CommonStateProvider = ({ children }) => {
       })
       .then(data => {
         setUsers(data[0]);
+        setIsAdmin(data[0].access === 'admin' || data[0].access === 'dev');
       })
       .catch(error => {
         console.error('Error fetching user:', error);
@@ -266,13 +300,68 @@ export const CommonStateProvider = ({ children }) => {
       });
   };
 
+  const fetchAccounts = async (params = null) => {
+    let { user_id = null } = params;
+    
+    let url = `${apiUrl}/accounts`;
+    if (user_id) {
+      url += `?user_id=${user_id}`;
+    }
+  
+    return fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch acounts');
+        }
+        return response.json( );
+      })
+      .then(data => {
+        setAccounts(data?.accounts);
+        setIsPageLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching user:', error);
+        throw error;
+      });
+  };
+
+  const updateAccountStatus = async (user_id, status) => {
+    const formData = new FormData();
+    formData.append('user_id', user_id);
+    formData.append('status', status);
+
+    return fetch(`${apiUrl}/accounts`, {
+      method: 'POST',
+      body: formData,
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to update account status');
+      }
+    })
+    .then(() => {
+      if (users) {
+        fetchAccounts({user_id: users.user_id});
+      }
+    })
+    .catch(error => {
+      console.error('Error updating account status:', error);
+      throw error;
+    });
+  };
+
   const toggleSave = async (formData, imageField = null) => {
     setIsLoading(true);
     setResponse({id: currentPage, message: ''});
     let isSuccess = false;
+    const itemID = location.pathname.includes('item') ? location.pathname.split('/').pop() : null;
     try {
       if (imageField) {
         formData.append('image', imageField);
+      }
+
+      if (modalIdOpen === 'addForumClub') {
+        formData.append('club_id', itemID);
       }
 
       const requestOptions = {
@@ -303,6 +392,7 @@ export const CommonStateProvider = ({ children }) => {
 
         if (modalIdOpen === 'login' && data?.user) {
           setUsers(data?.user);
+          setIsAdmin(data?.user?.access === 'admin' || data?.user?.access === 'dev');
           setIsLoggedIn(true);
           setWithExpiry('isLoggedIn', true, 1 * 24 * 60 * 60 * 1000, { ...data?.user});
           localStorage.removeItem('isVisitor');
@@ -310,10 +400,16 @@ export const CommonStateProvider = ({ children }) => {
         } else if (modalIdOpen === 'addClub' || modalIdOpen === 'editClub') {
           setClubLists(data?.result);
           isSuccess = true;
-        } else if (modalIdOpen === 'addForum' || modalIdOpen === 'editForum') {
-          fetchForums({id: null, interestType, curricularType, searchString});
+        } else if (modalIdOpen === 'addForum' || modalIdOpen === 'editForum' || modalIdOpen === 'addForumClub') {
+          const newCurricularType = itemID || curricularType;
+          fetchForums({id: null, interestType, curricularType: newCurricularType, searchString});
           isSuccess = true;
-        } else if (modalIdOpen === 'addUser') {
+        } else if (modalIdOpen === 'signup') {
+          if (isLoggedIn) {
+            setResponse({id: currentPage, message: 'User added successfully. Default password is "password@1234"'});
+            fetchAccounts({user_id: users?.user_id});
+            return;
+          }
           setDisableField(true);
         } else if (modalIdOpen === 'profile') {
           setUsers(data?.user);
@@ -357,6 +453,11 @@ export const CommonStateProvider = ({ children }) => {
           fetchClubs({});
           navigate('/clubs');
         } else if (modalIdOpen === 'deleteForum' && data?.message) {
+          if (location.pathname.includes('item')) {
+            const itemID = location.pathname.split('/').pop() || null;
+            fetchForums({id: null, interestType, curricularType: itemID, searchString});
+            return;
+          }
           setWarningMessage({id: currentPage, message: data?.message});
           fetchForums({id: null, interestType, curricularType, searchString});
           navigate('/forums');
@@ -397,6 +498,7 @@ export const CommonStateProvider = ({ children }) => {
         select.selectedIndex = 0;
       }
     });
+    setResponse({id: currentPage, message: ''});
   };
   const visitorBtn = () => {
     setIsVisitor(true);
@@ -434,6 +536,7 @@ export const CommonStateProvider = ({ children }) => {
     setIsLoggedIn(false);
     setUsers(null);
     localStorage.removeItem('isLoggedIn');
+    navigate('/');
   };
 
   const getImage = (image) => {
@@ -476,8 +579,11 @@ export const CommonStateProvider = ({ children }) => {
       isVisitor, setIsVisitor,
       users, setUsers,
       isLoading, disableField,
+      isAdmin, navigate,
+      accounts, isPageLoading,
       getImage, formatDate,
       setWithExpiry, logout,
+      updateAccountStatus,
       toggleModal, closeModal, toggleSave, clearFields, deleteModal, visitorBtn }}>
       {children}
     </CommonStateContext.Provider>

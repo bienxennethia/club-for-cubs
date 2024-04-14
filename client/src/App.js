@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.scss';
 
 // components
+import Accounts from './structure/Accounts';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import Clubs from './structure/Clubs';
@@ -27,6 +28,7 @@ function App() {
               <Route path="/about" element={<AboutUs />} />
               <Route path="/clubs" element={<Clubs />} />
               <Route path="/forums" element={<Forums />}/>
+              <Route path="/accounts" element={<Accounts />} />
               <Route path="/item/:id" element={<Club />} />
             </Routes>
             <div className='content__background'></div>

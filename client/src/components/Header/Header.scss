@@ -130,6 +130,7 @@
 
   a:hover,
   a.active:not(.profile--link, .logout--link),
+  a.active.accounts--link,
   button:hover,
   button.active,
   button.hovered {
@@ -159,8 +160,8 @@
   }
 
   a.disabled {
-    opacity: 0.5; /* Example styling for a disabled NavLink */
-    pointer-events: none; /* Disables pointer events on the NavLink */
+    opacity: 0.5;
+    pointer-events: none;
   }
 
   a.hideForums {
