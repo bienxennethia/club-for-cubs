@@ -52,6 +52,12 @@
   }
 }
 
+.club__header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .club__header-title {
   font-weight: 900;
   font-size: t-rem(20);
@@ -71,10 +77,14 @@
     font-size: t-rem(70);
   }
 }
+.club__header-subtitle,
+.club__header-name span {
+  font-weight: 900;
+}
 
 .club__header-subtitle,
+.club__header-name,
 .club__header-name {
-  font-weight: 900;
   font-size: t-rem(15);
 
   @include bp-tablet {
@@ -87,6 +97,16 @@
 
   @include bp-xl-desktop {
     font-size: t-rem(35);
+  }
+}
+
+.club__header-name {
+  @include bp-tablet {
+    max-width: calc(100% - t-rem(70));
+  }
+
+  @include bp-desktop {
+    max-width: calc(100% - t-rem(120));
   }
 }
 
@@ -140,6 +160,8 @@
 
 .club__content-about {
   p {
+    line-height: 2rem;
+
     &:not(:first-of-type) {
       margin-top: t-rem(15);
     }

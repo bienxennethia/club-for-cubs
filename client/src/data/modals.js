@@ -217,6 +217,19 @@ export const modals = [
           placeholder: "Enter Club Name"
         },
         {
+          name: "president",
+          type: "text",
+          label: "President:",
+          placeholder: "Enter Club President"
+        },
+        {
+          name: "moderators",
+          type: "textarea",
+          label: "Moderators:",
+          placeholderText: "Separate moderators with commas e.g. John Doe, Jane Doe",
+          placeholder: "Enter Club Moderators"
+        },
+        {
           name: "description",
           required: true,
           type: "textarea",
@@ -272,6 +285,19 @@ export const modals = [
           type: "text",
           label: "Club Name:",
           placeholder: "Enter Club Name"
+        },
+        {
+          name: "president",
+          type: "text",
+          label: "President:",
+          placeholder: "Enter Club President"
+        },
+        {
+          name: "moderators",
+          type: "text",
+          label: "Moderators:",
+          placeholderText: "Separate moderators with commas e.g. John Doe, Jane Doe",
+          placeholder: "Enter Club Moderators"
         },
         {
           name: "description",

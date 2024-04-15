@@ -91,9 +91,9 @@ router.get('/clubs', async (req, res) => {
   }
 });
 
-
+// add club
 router.post('/clubs', async (req, res) => {
-  const { name, description, type, mission, vision, image } = req.body;
+  const { name, description, type, mission, vision, image, president, moderators } = req.body;
 
   if (!name || !type) {
     return res.status(400).json({ message: 'Name and club type ID are required' });
@@ -104,8 +104,8 @@ router.post('/clubs', async (req, res) => {
     filename = await generateCloudinaryImage(image);
   }
 
-  const query = 'INSERT INTO club_table (name, description, type, image, mission, vision) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *';
-  const values = [name, description, type, filename, mission, vision];
+  const query = 'INSERT INTO club_table (name, description, type, image, mission, vision, president, moderators) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *';
+  const values = [name, description, type, filename, mission, vision, president, moderators];
 
   try {
     const { rows } = await pool.query(query, values);
@@ -118,9 +118,10 @@ router.post('/clubs', async (req, res) => {
   }
 });
 
+//edit club
 router.put('/clubs/:id', async (req, res) => {
   const { id } = req.params;
-  const { name, description, type, image, mission, vision } = req.body;
+  const { name, description, type, image, mission, vision, president, moderators } = req.body;
 
   if (!name || !type) {
     return res.status(400).json({ message: 'Name and club type ID are required' });
@@ -136,20 +137,28 @@ router.put('/clubs/:id', async (req, res) => {
   if (filename) {
     query = `
       UPDATE club_table 
-      SET name = $1, description = $2, type = $3, image = $4, mission = $5, vision = $6 
-      WHERE id = $7 RETURNING *`;
-    values = [name, description, type, filename, mission, vision, id];
+      SET name = $1, description = $2, type = $3, image = $4, mission = $5, vision = $6, president = $7, moderators = $8 
+      WHERE id = $9 RETURNING *`;
+    values = [name, description, type, filename, mission, vision, president, moderators, id];
   } else {
     query = `
       UPDATE club_table 
-      SET name = $1, description = $2, type = $3, mission = $4, vision = $5 
-      WHERE id = $6 RETURNING *`;
-    values = [name, description, type, mission, vision, id];
+      SET name = $1, description = $2, type = $3, mission = $4, vision = $5, president = $6, moderators = $7 
+      WHERE id = $8 RETURNING *`;
+    values = [name, description, type, mission, vision, president, moderators, id];
   }
 
   try {
-    const { rows } = await pool.query(query, values);
-    res.status(200).json({ message: 'Club updated successfully', result: rows });
+    await pool.query(query, values);
+    
+  query = `
+    SELECT club_table.*, club_type_table.name AS type_name
+    FROM club_table 
+    LEFT JOIN club_type_table ON club_table.type = club_type_table.id
+    WHERE club_table.id = $1`;
+
+    const { rows: result } = await pool.query(query, [id]);
+    res.status(200).json({ message: 'Club updated successfully', result: result });
   } catch (err) {
     console.error('Error executing PostgreSQL query:', err);
     res.status(500).json({ message: 'Internal server error' });

@@ -4,7 +4,7 @@ import './Club.scss';
 import { useCommonState } from "../../data/commonState";
 
 const ClubHeader = ({handleTabs, activeTab}) => {
-  const { clubLists: clubData, getImage, isLoggedIn } = useCommonState();
+  const { clubLists: clubData, getImage } = useCommonState();
   
   return (
     <div className="club__content club__content-header">
@@ -16,7 +16,8 @@ const ClubHeader = ({handleTabs, activeTab}) => {
             clubData[0]?.name && <h2 className="club__header-title">{clubData[0]?.name}</h2>
           }
           { clubData[0]?.type_name && <p className="club__header-subtitle">{clubData[0]?.type_name}</p> }
-          { isLoggedIn && <p className="club__header-name">Moderator:</p> }
+          { clubData[0]?.president && <p className="club__header-name"><span>President:</span> {clubData[0]?.president}</p> }
+          { clubData[0]?.moderators && <p className="club__header-name"><span>Moderator:</span> {clubData[0]?.moderators}</p> }
           <AdminBtn editModalId="editClub" deleteModalId="deleteClub" id={clubData[0]?.id}/>
         </div>
       </div>
