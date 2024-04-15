@@ -89,6 +89,10 @@ export const CommonStateProvider = ({ children }) => {
     setCurrentPage(location.pathname);
     setSelectedClubType(null);
 
+    if (location.pathname.includes('clubs') && location.pathname.includes('item')) {
+      setClubLists([]);
+    }
+
     if (location.pathname.includes('forums')) {
       setIsPageLoading(true);
       document.querySelector('.content').classList.add('forums');

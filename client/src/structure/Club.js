@@ -1,9 +1,13 @@
 import ClubHeader from "../components/Club/ClubHeader";
 import ClubContent from "../components/Club/ClubContent";
+import Loading from "../components/Loading/Loading";
 import { useState } from "react";
+
+import { useCommonState } from "../data/commonState";
 
 const Club = () => {
   const [activeTab, setActiveTab] = useState('about');
+  const {isPageLoading} = useCommonState();
 
   const handleTabs = (tab) => {
     if (tab === 'about') {
@@ -16,8 +20,12 @@ const Club = () => {
   return (
     <section className="club noBackground">
       <div className="club__container container">
-        <ClubHeader handleTabs={handleTabs} activeTab={activeTab} />
-        <ClubContent activeTab={activeTab} />
+        {isPageLoading ? <Loading /> : 
+          <>
+            <ClubHeader handleTabs={handleTabs} activeTab={activeTab} />
+            <ClubContent activeTab={activeTab} />
+          </>
+        }
       </div>
     </section>
   )
